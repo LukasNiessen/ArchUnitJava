@@ -25,6 +25,13 @@ archunitjava <check|graph|explain|validate-config>
 Command-line format flags override the corresponding configuration value. Other unknown options
 are rejected.
 
+Both `check` and `graph` reject incomplete imports by default, including corrupt JARs,
+malformed class files, and exceeded input limits. `check` retains import diagnostics in its
+results and returns exit code `4`; `graph` returns `4` without emitting a partial graph.
+Set `allowIncompleteAnalysis=true` only when partial results are acceptable. In that mode,
+`check` retains the import failures as warnings. A graph command does not enforce the configured
+architecture policies: violations alone do not prevent graph export.
+
 ## Root keys
 
 | Key | Required | Values and default |

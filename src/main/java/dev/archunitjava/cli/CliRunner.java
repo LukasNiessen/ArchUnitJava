@@ -107,6 +107,11 @@ public final class CliRunner {
 
     private static int graph(CliConfiguration configuration, Appendable out) {
         CliAnalysisResult analysis = new CliAnalyzer().analyze(configuration);
+        if (!configuration.checkOptions().allowIncompleteAnalysis()
+                && !CliAnalyzer.importFailures(analysis.imports()).isEmpty()) {
+            throw new IllegalStateException("Graph import is incomplete; repair the inputs or "
+                    + "explicitly set allowIncompleteAnalysis=true to render a partial graph");
+        }
         GraphSnapshot snapshot = switch (configuration.graphDomain()) {
             case TYPES -> GraphSnapshotQuery.types(analysis.graph()).snapshot();
             case PACKAGES -> GraphSnapshotQuery.packages(analysis.graph()).snapshot();

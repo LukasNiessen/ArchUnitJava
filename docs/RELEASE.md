@@ -106,6 +106,9 @@ replaced or deleted.
 
 ## Local review commands
 
+For ownership changes, see the [maintainer handover](MAINTAINER_HANDOVER.md) for repository,
+publishing, signing, documentation, and analytics dependencies.
+
 ```shell
 ./mvnw --batch-mode --no-transfer-progress verify
 ./mvnw --batch-mode --no-transfer-progress -Prelease-candidate verify

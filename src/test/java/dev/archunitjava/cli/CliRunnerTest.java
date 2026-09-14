@@ -68,6 +68,91 @@ final class CliRunnerTest {
     }
 
     @Test
+    void dottedRuleIdsAreAcceptedAndUnknownFieldsAreRejected() throws IOException {
+        String base = Files.readString(configuration);
+        String dotted = base.replace("boundary", "api.boundary");
+        configuration = writeConfiguration(dotted);
+        assertEquals(CliExitCode.SUCCESS.code(), run("validate-config").exit());
+        assertEquals(CliExitCode.POLICY_VIOLATION.code(), run("check").exit());
+
+        configuration = writeConfiguration(dotted + "rule.api.boundary.unknown=true\n");
+        assertEquals(CliExitCode.INVALID_CONFIGURATION.code(), run("validate-config").exit());
+
+        configuration = writeConfiguration(dotted + "rule.api.other.domain=types\n");
+        assertEquals(CliExitCode.INVALID_CONFIGURATION.code(), run("validate-config").exit());
+    }
+
+    @Test
+    void graphRejectsIncompleteBytecodeUnlessExplicitlyAllowed() throws IOException {
+        Files.write(classes.resolve("Broken.class"), new byte[] {0, 1, 2, 3});
+        for (String format : new String[] {"dot", "mermaid", "json", "csv", "d2", "html"}) {
+            Invocation graph = run("graph", "--graph-format", format);
+            assertEquals(CliExitCode.ANALYSIS_ERROR.code(), graph.exit(), format);
+            assertTrue(graph.out().isEmpty(), format);
+            assertTrue(graph.error().contains("incomplete"), format);
+        }
+        configuration = writeConfiguration(Files.readString(configuration)
+                .replace("allowIncompleteAnalysis=false", "allowIncompleteAnalysis=true"));
+        Invocation allowed = run("graph", "--graph-format", "json");
+        assertEquals(CliExitCode.SUCCESS.code(), allowed.exit());
+        assertTrue(allowed.out().contains("api.A"));
+    }
+
+    @Test
+    void corruptInputArchiveCannotProduceAPassingPartialAnalysis() throws IOException {
+        Files.write(root.resolve("broken.jar"), new byte[] {0, 1, 2, 3});
+        configuration = writeConfiguration(Files.readString(configuration)
+                .replace("inputs=classes", "inputs=classes,broken.jar")
+                .replace("origins=exact:api.A", "origins=exact:internal.B"));
+        Invocation check = run("check", "--result-format", "json");
+        assertEquals(CliExitCode.ANALYSIS_ERROR.code(), check.exit());
+        assertTrue(check.out().contains("INCOMPLETE"));
+        assertEquals(CliExitCode.ANALYSIS_ERROR.code(), run("graph").exit());
+        assertEquals(dev.archunitjava.result.RuleStatus.INCOMPLETE,
+                new CliAnalyzer().analyze(CliConfigurationLoader.load(configuration, root))
+                        .results().results().getFirst().status());
+        configuration = writeConfiguration(Files.readString(configuration)
+                .replace("allowIncompleteAnalysis=false", "allowIncompleteAnalysis=true"));
+        Invocation allowed = run("check", "--result-format", "json");
+        assertEquals(CliExitCode.SUCCESS.code(), allowed.exit());
+        assertTrue(allowed.out().contains("cli.input.IO_FAILURE"));
+        assertTrue(allowed.out().contains("WARNING"));
+    }
+
+    @Test
+    void malformedClassCannotProduceAPassingPartialAnalysis() throws IOException {
+        Files.write(classes.resolve("Broken.class"), new byte[] {0, 1, 2, 3});
+        configuration = writeConfiguration(Files.readString(configuration)
+                .replace("origins=exact:api.A", "origins=exact:internal.B"));
+        Invocation check = run("check", "--result-format", "json");
+        assertEquals(CliExitCode.ANALYSIS_ERROR.code(), check.exit());
+        assertTrue(check.out().contains("cli.classfile."));
+        assertTrue(check.out().contains("INCOMPLETE"));
+    }
+
+    @Test
+    void incompleteChecksRetainObservedViolations() throws IOException {
+        Files.write(classes.resolve("Broken.class"), new byte[] {0, 1, 2, 3});
+        var result = new CliAnalyzer().analyze(CliConfigurationLoader.load(configuration, root))
+                .results().results().getFirst();
+        assertEquals(dev.archunitjava.result.RuleStatus.INCOMPLETE, result.status());
+        assertFalse(result.violations().isEmpty());
+        assertTrue(result.diagnostics().stream()
+                .anyMatch(value -> value.code().startsWith("cli.classfile.")));
+    }
+
+    @Test
+    void graphIgnoresRuleSelectionFailuresAndHarmlessDuplicateInputs() throws IOException {
+        configuration = writeConfiguration(Files.readString(configuration)
+                .replace("inputs=classes", "inputs=classes,./classes")
+                .replace("targets=exact:internal.B", "targets=exact:absent.C"));
+        Invocation graph = run("graph", "--graph-format", "json");
+        assertEquals(CliExitCode.SUCCESS.code(), graph.exit());
+        assertTrue(graph.out().contains("api.A"));
+        assertTrue(graph.error().isEmpty());
+    }
+
+    @Test
     void graphExplainAndValidationCommandsAreStableAndBounded() {
         Invocation validation = run("validate-config");
         assertEquals(CliExitCode.SUCCESS.code(), validation.exit());

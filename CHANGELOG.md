@@ -5,6 +5,13 @@ uses semantic versioning for public releases.
 
 ## [Unreleased]
 
+### Fixed
+
+- accept documented dotted CLI rule IDs while still rejecting unknown rule fields;
+- retain input and parser failures in CLI/direct `CliAnalyzer` results so corrupt archives or
+  malformed classes cannot silently produce passing partial checks; and
+- reject incomplete graph imports by default before writing graph output.
+
 ### Changed
 
 - align the project license with the ArchUnitEverything family by adopting the MIT License.

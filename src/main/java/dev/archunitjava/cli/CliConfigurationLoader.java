@@ -168,7 +168,7 @@ public final class CliConfigurationLoader {
                 throw new CliConfigurationException("Unknown configuration key: " + key);
             }
             String remainder = key.substring("rule.".length());
-            int separator = remainder.indexOf('.');
+            int separator = remainder.lastIndexOf('.');
             if (separator < 1 || !ruleIds.contains(remainder.substring(0, separator))
                     || !RULE_FIELDS.contains(remainder.substring(separator + 1))) {
                 throw new CliConfigurationException("Unknown rule configuration key: " + key);
