@@ -13,8 +13,8 @@ release mechanics work; it does not promote the provisional pre-1.0 Java API to 
 
 ## Evidence available
 
-- The local audit runs 347 ordinary tests with zero failures or errors; two platform/opt-in cases
-  are intentionally skipped in that suite.
+- The current suite contains 353 tests with zero failures or errors; two platform/opt-in cases are
+  intentionally skipped in a standard run. The release audit also exercises the performance suite.
 - Windows and Linux CI run the full JDK 25 Maven verification and an independent RAG consumer.
 - The primary JAR has a fixed output timestamp and is rebuilt byte-for-byte in CI.
 - Source and Javadoc JARs are attached. Javadoc doclint enforces every category except missing
