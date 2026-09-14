@@ -36,9 +36,10 @@ This document prepares a transfer; it does not record a completed ownership chan
   contain them. Plan a subsequent beta release after choosing publisher access and ownership.
 - The current source uses MIT; the already published `0.1.0` artifact retains its original Apache
   2.0 metadata. Keep that distinction explicit until a subsequent release is published.
-- CodeQL is active. At the review date, Dependabot security alerts/security updates and secret
-  scanning/push protection were disabled. Enable the appropriate GitHub security features and
-  review any resulting alerts. Scheduled dependency-version PRs are already enabled.
+- CodeQL, Dependabot vulnerability alerts/security updates, secret scanning, and secret-scanning
+  push protection are active. GitHub left non-provider patterns and validity checks unavailable or
+  disabled when requested during the review. Review any resulting alerts after transfer. Scheduled
+  dependency-version PRs are also enabled.
 - No repository rulesets were present at the review date. A protected default branch is an
   optional next step when more maintainers contribute; it should fit the team's merge workflow.
 - The public API remains provisional and JDK 25 remains required. A repository transfer is not
