@@ -1,7 +1,7 @@
 # GitHub Pages
 
 ArchUnitJava publishes its product guide and generated Java API reference at
-<https://tristankruse.github.io/ArchUnitJava/>.
+<https://lukasniessen.github.io/ArchUnitJava/>.
 
 The landing page is maintained in `docs/site/`. The API reference is generated from the public Java
 source with the Maven Javadoc plugin. `scripts/build-pages.ps1` combines both into `target/pages`,

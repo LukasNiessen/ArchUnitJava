@@ -6,7 +6,7 @@ library remains the mature default for production Java systems.
 
 This guide maps each important feature to its normal workflow. The
 [five-minute quickstart](../README.md#-five-minute-quickstart) remains the shortest path to a first
-passing rule, while the [generated API reference](https://tristankruse.github.io/ArchUnitJava/api/)
+passing rule, while the [generated API reference](https://lukasniessen.github.io/ArchUnitJava/api/)
 documents every public package and type.
 
 ## Choose an integration path
@@ -60,7 +60,7 @@ Important behavior:
 - import filters and `.archignore` can remove intentional inputs; and
 - approved roots and resource limits constrain paths, archives, diagnostics, and caches.
 
-Start with the [`importer` API](https://tristankruse.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/importer/package-summary.html)
+Start with the [`importer` API](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/importer/package-summary.html)
 for custom imports. Read the [compatibility contract](COMPATIBILITY.md) before claiming support for
 another runtime, compiler, or class-file version.
 
@@ -76,7 +76,7 @@ The properties interface accepts only:
 - bounded globs such as `glob:com.example.api.**`.
 
 The Java API additionally provides semantic selectors and a deliberately named trusted-regex path.
-Use [`TypeSelector`](https://tristankruse.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/selector/TypeSelector.html)
+Use [`TypeSelector`](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/selector/TypeSelector.html)
 and the surrounding `selector` package as the lower-level starting point. Empty selections fail by
 default so a renamed or removed package cannot silently disable a policy.
 
@@ -101,7 +101,7 @@ an explicit passed, failed, skipped, or incomplete status.
 | Diagrams and presets | PlantUML adherence and reusable policy sets | `PlantUmlRules`, the `presets` package |
 
 These entry points are all under the
-[`rules` API package](https://tristankruse.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/rules/package-summary.html).
+[`rules` API package](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/rules/package-summary.html).
 The generated Javadocs list the overloads and option values. Prefer a narrow selector and an
 explicit external-dependency policy over broad patterns that happen to pass today.
 
@@ -117,7 +117,7 @@ opens, uses, and provides relationships rather than reducing modules to packages
 PlantUML support parses a bounded component diagram subset. Use it when the diagram is the reviewed
 contract; choose an explicit policy for types or dependencies that do not map to a diagram
 component. See the
-[`diagram.plantuml` API](https://tristankruse.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/diagram/plantuml/package-summary.html).
+[`diagram.plantuml` API](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/diagram/plantuml/package-summary.html).
 
 ## JUnit integration
 
@@ -146,7 +146,7 @@ can override configured result or graph formats without changing policy semantic
 CSV is spreadsheet-safe by default. The explicitly named `renderMachineReadable` API preserves
 lossless values and must be handled as data rather than opened directly in a spreadsheet. Renderer
 entry points are in the
-[`report` API](https://tristankruse.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/report/package-summary.html).
+[`report` API](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/report/package-summary.html).
 
 ## Baselines and suppressions
 
@@ -157,7 +157,7 @@ a bounded strict parser.
 
 Treat a baseline change as an architecture decision: review it in the same pull request as the code
 that changes the finding. Start with the
-[`baseline` API](https://tristankruse.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/baseline/package-summary.html)
+[`baseline` API](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/baseline/package-summary.html)
 and the staged workflow in [Migration and adoption](MIGRATION.md).
 
 ## Metrics and performance evidence
@@ -193,5 +193,5 @@ contracts are in [`build-integrations/maven`](../build-integrations/maven) and
 The exact configuration keys and CLI behavior are documented in the
 [CLI configuration reference](CLI_REFERENCE.md). Security-sensitive limits and residual risks are
 documented in the [threat model](THREAT_MODEL.md). For unresolved questions, use
-[GitHub Discussions](https://github.com/TristanKruse/ArchUnitJava/discussions) or open an issue as
+[GitHub Discussions](https://github.com/LukasNiessen/ArchUnitJava/discussions) or open an issue as
 described in [SUPPORT.md](../SUPPORT.md).

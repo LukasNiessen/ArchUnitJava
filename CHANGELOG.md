@@ -15,6 +15,8 @@ uses semantic versioning for public releases.
 ### Changed
 
 - align the project license with the ArchUnitEverything family by adopting the MIT License.
+- update repository ownership, maintainer metadata, and documentation links after the GitHub
+  transfer to Lukas Niessen while retaining the published Maven Central coordinates.
 
 ### Documentation
 
@@ -51,5 +53,5 @@ uses semantic versioning for public releases.
 - The performance corpus is regression evidence, not an absolute scalability claim.
 - Unrestricted regex and lossless non-neutralized CSV require explicitly named trusted APIs.
 
-[Unreleased]: https://github.com/TristanKruse/ArchUnitJava/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/TristanKruse/ArchUnitJava/releases/tag/v0.1.0
+[Unreleased]: https://github.com/LukasNiessen/ArchUnitJava/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/LukasNiessen/ArchUnitJava/releases/tag/v0.1.0

@@ -9,6 +9,6 @@ publishing another person's private information are not acceptable. Maintainers 
 or reject contributions and participation that violate these expectations.
 
 Report conduct concerns privately to the maintainer through the contact options on the
-[maintainer's GitHub profile](https://github.com/TristanKruse). Do not include vulnerability details
+[maintainer's GitHub profile](https://github.com/LukasNiessen). Do not include vulnerability details
 in a conduct report; use the private process in [SECURITY.md](SECURITY.md). Reports will be reviewed
 in good faith, with confidentiality limited to what is practical for investigation and resolution.

@@ -2,10 +2,10 @@
 
 ArchUnitJava is currently a public beta maintained on a best-effort basis.
 
-- Ask usage and design questions in [GitHub Discussions](https://github.com/TristanKruse/ArchUnitJava/discussions).
-- Report reproducible bugs with the [bug form](https://github.com/TristanKruse/ArchUnitJava/issues/new?template=bug_report.yml).
-- Propose product improvements with the [feature form](https://github.com/TristanKruse/ArchUnitJava/issues/new?template=feature_request.yml).
-- Report vulnerabilities privately through [GitHub Security Advisories](https://github.com/TristanKruse/ArchUnitJava/security/advisories/new), following [SECURITY.md](SECURITY.md).
+- Ask usage and design questions in [GitHub Discussions](https://github.com/LukasNiessen/ArchUnitJava/discussions).
+- Report reproducible bugs with the [bug form](https://github.com/LukasNiessen/ArchUnitJava/issues/new?template=bug_report.yml).
+- Propose product improvements with the [feature form](https://github.com/LukasNiessen/ArchUnitJava/issues/new?template=feature_request.yml).
+- Report vulnerabilities privately through [GitHub Security Advisories](https://github.com/LukasNiessen/ArchUnitJava/security/advisories/new), following [SECURITY.md](SECURITY.md).
 
 Before opening a bug, test the latest published beta, check the
 [known limitations](README.md#-current-limitations), and include the JDK, operating system,

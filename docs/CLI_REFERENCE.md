@@ -137,4 +137,4 @@ ordinary architecture violation.
 
 Continue with the [user guide](USER_GUIDE.md), the
 [working example](../examples/basic), or the
-[CLI API reference](https://tristankruse.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/cli/package-summary.html).
+[CLI API reference](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/cli/package-summary.html).
