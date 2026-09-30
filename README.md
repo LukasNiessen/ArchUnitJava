@@ -227,6 +227,10 @@ are described in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## 🔎 Logging and inspection
 
+> These logging and pretty-report APIs require **0.2.0 or later**, or a build of
+> the current `main` branch from source. The published **0.1.0** artifact used in
+> the quickstart does not include them.
+
 Logging is **off by default** and scoped to an individual check or analysis. Choose
 `ERROR`, `WARN`, `INFO`, or `DEBUG`; higher verbosity includes all lower levels.
 Logging does not change rule outcomes, violation identities, evidence, or machine-readable reports.
