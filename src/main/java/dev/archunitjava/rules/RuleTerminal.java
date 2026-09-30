@@ -1,6 +1,7 @@
 package dev.archunitjava.rules;
 
 import dev.archunitjava.execution.CheckOptions;
+import dev.archunitjava.diagnostics.LogLevel;
 import dev.archunitjava.execution.EmptySelectionPolicy;
 import dev.archunitjava.result.Diagnostic;
 import dev.archunitjava.result.RuleMetadata;
@@ -46,6 +47,13 @@ public final class RuleTerminal {
                         .thenComparing(value -> value.selector().text()))
                 .toList();
         Objects.requireNonNull(ordinaryEvaluation, "ordinaryEvaluation");
+        if (options.logging().enabled(LogLevel.DEBUG)) {
+            selections.stream().sorted(java.util.Comparator.comparing(RuleSelection::role)
+                    .thenComparing(value -> value.selector().text())).forEach(selection ->
+                    options.logging().emit(LogLevel.DEBUG, "ASSERT", "Selection", () -> Map.of(
+                            "rule", metadata.semanticIdentity(), "role", selection.role(),
+                            "selector", selection.selector().text(), "selected", "" + selection.selectedCount())));
+        }
         if (empty.isEmpty() || options.emptySelectionPolicy() == EmptySelectionPolicy.ALLOW) {
             return requireMetadata(metadata, ordinaryEvaluation.create(List.of()));
         }

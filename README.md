@@ -31,7 +31,7 @@ _Inspired by the established [ArchUnit](https://www.archunit.org/) project, but 
 implemented and not affiliated with ArchUnit. This is not a drop-in replacement._
 
 [Quickstart](#-five-minute-quickstart) · [Use cases](#-use-cases) ·
-[Capabilities](#-capabilities) · [Reports](#-reports) ·
+[Capabilities](#-capabilities) · [Inspection](#-logging-and-inspection) · [Reports](#-reports) ·
 [Example repository](#-independent-example-repository) ·
 [User guide](docs/USER_GUIDE.md) · [CLI reference](docs/CLI_REFERENCE.md) ·
 [Documentation](https://lukasniessen.github.io/ArchUnitJava/) ·
@@ -224,6 +224,104 @@ package and type. The [user guide](docs/USER_GUIDE.md) maps every important feat
 normal workflow and API entry point; the [CLI reference](docs/CLI_REFERENCE.md) documents every
 configuration key, command, format, and exit code. The internal architecture and ownership rules
 are described in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## 🔎 Logging and inspection
+
+Logging is **off by default** and scoped to an individual check or analysis. Choose
+`ERROR`, `WARN`, `INFO`, or `DEBUG`; higher verbosity includes all lower levels.
+Logging does not change rule outcomes, violation identities, evidence, or machine-readable reports.
+
+Given an `ArchitectureRule rule`, enable detailed inspection and a formatted console report:
+
+```java
+import dev.archunitjava.diagnostics.AnalysisLogging;
+import dev.archunitjava.diagnostics.LogLevel;
+import dev.archunitjava.execution.CheckOptions;
+import dev.archunitjava.report.ConsoleColor;
+import dev.archunitjava.report.ConsoleResultRenderer;
+import dev.archunitjava.report.ResultReport;
+import java.util.List;
+
+var logging = AnalysisLogging.text(LogLevel.DEBUG, System.err, ConsoleColor.AUTO);
+var options = CheckOptions.builder().logging(logging).build();
+var result = rule.check(options);
+
+System.out.print(ConsoleResultRenderer.renderPretty(
+        ResultReport.of(List.of(result)), ConsoleColor.AUTO));
+```
+
+| Level | What you see |
+| --- | --- |
+| `OFF` | Nothing; the default |
+| `ERROR` | Failed or incomplete rules, execution failures, and error diagnostics |
+| `WARN` | Errors plus skipped rules and import or rule warnings |
+| `INFO` | Warnings plus rule start/completion, import and graph counts, and analysis summaries |
+| `DEBUG` | All of the above plus selected resources/types, external types, graph nodes/edges and evidence, rule selectors and counts, dependency filter decisions, metric samples/thresholds, and every violation with its evidence |
+
+Use the same observer for the complete bytecode pipeline:
+
+```java
+import dev.archunitjava.cli.CliAnalyzer;
+import dev.archunitjava.cli.CliConfigurationLoader;
+
+var configuration = CliConfigurationLoader.load(configurationFile, approvedRoot);
+var analysis = new CliAnalyzer().analyze(configuration, logging);
+```
+
+The direct Java analyzer overload enables logging without changing CLI configuration keys or
+stdout report formats. For independently constructed models, graphs, and metric reports,
+`AnalysisInspection.imports(importResult, logging)`,
+`AnalysisInspection.graph(graph, logging)`, and
+`AnalysisInspection.metrics(samples, logging)` inspect existing immutable data without
+re-importing classes or reevaluating rules. Dependency-rule checks automatically explain their
+projected graph, selected subjects, and self/external dependency filtering. Metric-threshold
+checks automatically show both passing and failing samples at `DEBUG`.
+
+Example plain-text output (ANSI highlighting is added on supported terminals):
+
+```text
+[INFO] EXTRACT | Import complete {externalTypes=1, resources=2, types=2}
+[INFO] PROJECT | Graph ready {edges=2, nodes=3}
+[DEBUG] ASSERT | Selection {role=origins, rule=..., selected=1, selector=...}
+[ERROR] REPORT | Rule complete {rule=..., status=FAILED, violations=1}
+
+ARCHUNITJAVA | Architecture report
+=====================================
+[FAIL:POLICY] API boundary (...)
+  - ... [ERROR] dependency.forbidden
+      at classes/api/A.class
+  Because: internal implementation must remain private
+
+Summary: PASSED=0 FAILED=1 SKIPPED=0 INCOMPLETE=0
+```
+
+Pretty reports use a heading, highlighted status lines, indented evidence, the rule rationale,
+and a status summary. `ConsoleColor.AUTO` uses ANSI only when a terminal is detected;
+`NEVER` always produces plain text and `ALWAYS` explicitly enables ANSI for a caller that
+knows its destination supports it. `NO_COLOR`, `CI`, and `TERM=dumb` suppress ANSI in
+every mode. Existing `ConsoleResultRenderer.render(...)` overloads keep their original
+plain-text output and limits; `renderPretty` retains the same evidence and diagnostic limits.
+
+### Save logs as CI artifacts or collect structured events
+
+```java
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+
+try (var writer = Files.newBufferedWriter(logFile, StandardCharsets.UTF_8)) {
+    var fileLogging = AnalysisLogging.text(LogLevel.DEBUG, writer); // plain text
+    rule.check(CheckOptions.builder().logging(fileLogging).build());
+}
+```
+
+`AnalysisLogging.of(LogLevel.DEBUG, event -> ...)` accepts a custom sink. Each immutable
+`AnalysisEvent` has a level, pipeline stage, message, and sorted detail map. Text output
+escapes target-controlled line breaks, terminal controls, and formatting characters.
+Debug events are not truncated, so stream them to a writer for large models; the library
+does not retain an event buffer. Disabled levels do not evaluate detail suppliers.
+Sink runtime exceptions, including writer failures, are isolated from evaluation; fatal VM
+errors are not swallowed. Callers own sink concurrency, flushing, and file lifetime.
+There is no global logger, implicit log file, or implicit console output.
 
 ## 📊 Reports
 

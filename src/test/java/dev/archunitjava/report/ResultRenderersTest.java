@@ -23,6 +23,26 @@ import org.junit.jupiter.api.Test;
 
 final class ResultRenderersTest {
     @Test
+    void prettyReportsAddBoundedLayoutAndOptionalColorWithoutChangingPlainReports() {
+        ResultReport report = report();
+        ResultRenderLimits limits = new ResultRenderLimits(1, 0, 1);
+        String plainBefore = ConsoleResultRenderer.render(report, limits);
+        String pretty = ConsoleResultRenderer.renderPretty(report, limits, ConsoleColor.NEVER, true, Map.of());
+        String colored = ConsoleResultRenderer.renderPretty(report, limits, ConsoleColor.AUTO, true, Map.of());
+        assertEquals(pretty, colored.replaceAll("\u001b\\[[0-9;]*m", ""));
+        assertTrue(colored.contains("\u001b[1;32m[PASS]"));
+        assertTrue(pretty.contains("ARCHUNITJAVA | Architecture report"));
+        assertTrue(pretty.contains("Summary: PASSED=1 FAILED=1 SKIPPED=1 INCOMPLETE=1"));
+        assertTrue(pretty.contains("Because: Keep &lt;safe&gt; & reliable"));
+        assertTrue(pretty.contains("... 2 more evidence"));
+        assertEquals(pretty, ConsoleResultRenderer.renderPretty(report, limits, ConsoleColor.ALWAYS,
+                true, Map.of("NO_COLOR", "")));
+        assertEquals(pretty, ConsoleResultRenderer.renderPretty(report, limits, ConsoleColor.AUTO,
+                false, Map.of()));
+        assertEquals(plainBefore, ConsoleResultRenderer.render(report, limits));
+    }
+
+    @Test
     void jsonIsVersionedLosslessDeterministicAndUtf8() {
         ResultReport report = report();
         String first = ResultJsonRenderer.render(report);

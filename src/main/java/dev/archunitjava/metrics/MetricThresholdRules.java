@@ -1,6 +1,8 @@
 package dev.archunitjava.metrics;
 
 import dev.archunitjava.result.Diagnostic;
+import dev.archunitjava.diagnostics.AnalysisInspection;
+import dev.archunitjava.diagnostics.LogLevel;
 import dev.archunitjava.result.RuleMetadata;
 import dev.archunitjava.result.RuleResult;
 import dev.archunitjava.result.Violation;
@@ -41,13 +43,18 @@ public final class MetricThresholdRules {
                 + ':' + limit.limit().stableValue() + ':' + limit.limit().unit();
         String description = limit.metric() + " must be " + limit.comparison() + ' '
                 + limit.limit().stableValue() + ' ' + limit.limit().unit();
-        return ArchitectureRules.define(identity, description, (metadata, options) ->
-                RuleTerminal.evaluate(
+        return ArchitectureRules.define(identity, description, (metadata, options) -> {
+                AnalysisInspection.metrics(values, options.logging());
+                options.logging().emit(LogLevel.DEBUG, "ASSERT", "Metric threshold", () -> Map.of(
+                        "metric", limit.metric().name(), "comparison", limit.comparison().name(),
+                        "limit", limit.limit().stableValue(), "unit", limit.limit().unit().name()));
+                return RuleTerminal.evaluate(
                         metadata,
                         options,
                         new SelectorDescription("subjects measured for " + limit.metric()),
                         values.size(),
-                        diagnostics -> evaluate(metadata, values, limit, diagnostics)));
+                        diagnostics -> evaluate(metadata, values, limit, diagnostics));
+        });
     }
 
     private static RuleResult evaluate(

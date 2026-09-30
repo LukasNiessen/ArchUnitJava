@@ -1,6 +1,8 @@
 package dev.archunitjava.rules;
 
 import dev.archunitjava.execution.CheckOptions;
+import dev.archunitjava.diagnostics.AnalysisInspection;
+import dev.archunitjava.diagnostics.LogLevel;
 import dev.archunitjava.graph.DependencyEdge;
 import dev.archunitjava.graph.DependencyEvidence;
 import dev.archunitjava.graph.DependencyGraph;
@@ -111,6 +113,12 @@ public final class DependencyRules {
             CheckOptions options,
             Domain domain,
             DependencyRuleSpec spec) {
+        AnalysisInspection.graph(domain.graph, options.logging());
+        options.logging().emit(LogLevel.DEBUG, "ASSERT", "Selected subjects", () -> Map.of(
+                "origins", domain.origins.toString(), "targets", domain.targets.toString()));
+        options.logging().emit(LogLevel.DEBUG, "ASSERT", "Dependency policies", () -> Map.of(
+                "mode", spec.mode().name(), "self", spec.selfDependencies().name(),
+                "external", spec.externalDependencies().name()));
         return RuleTerminal.evaluate(
                 metadata,
                 options,
@@ -134,6 +142,16 @@ public final class DependencyRules {
         List<Diagnostic> diagnostics = new ArrayList<>(terminalDiagnostics);
         boolean externalFailure = false;
         for (DependencyEdge edge : domain.graph.edges()) {
+            if (options.logging().enabled(LogLevel.DEBUG)) {
+                String decision = !domain.origins.contains(edge.origin()) ? "origin not selected"
+                        : spec.selfDependencies() == SelfDependencyPolicy.IGNORE && edge.origin().equals(edge.target())
+                                ? "self dependency ignored"
+                        : !domain.known.contains(edge.target()) && spec.externalDependencies() == ExternalDependencyPolicy.IGNORE
+                                ? "external dependency ignored" : "evaluated";
+                options.logging().emit(LogLevel.DEBUG, "ASSERT", "Dependency filter", () -> Map.of(
+                        "origin", edge.origin().stableKey(), "target", edge.target().stableKey(),
+                        "decision", decision, "targetSelected", "" + domain.targets.contains(edge.target())));
+            }
             if (!domain.origins.contains(edge.origin())) continue;
             if (spec.selfDependencies() == SelfDependencyPolicy.IGNORE
                     && edge.origin().equals(edge.target())) continue;

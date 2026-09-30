@@ -1,6 +1,7 @@
 package dev.archunitjava.execution;
 
 import java.util.Objects;
+import dev.archunitjava.diagnostics.AnalysisLogging;
 
 /** Immutable policies applied uniformly by architecture-rule terminals. */
 public final class CheckOptions {
@@ -8,10 +9,12 @@ public final class CheckOptions {
 
     private final EmptySelectionPolicy emptySelectionPolicy;
     private final boolean allowIncompleteAnalysis;
+    private final AnalysisLogging logging;
 
     private CheckOptions(Builder builder) {
         emptySelectionPolicy = builder.emptySelectionPolicy;
         allowIncompleteAnalysis = builder.allowIncompleteAnalysis;
+        logging = builder.logging;
     }
 
     /** Returns the deterministic strict defaults used by {@link Checkable#check()}. */
@@ -40,16 +43,22 @@ public final class CheckOptions {
         return allowIncompleteAnalysis;
     }
 
+    /** Per-check observations, disabled by default and independent of rule-result diagnostics. */
+    public AnalysisLogging logging() {
+        return logging;
+    }
+
     @Override
     public boolean equals(Object other) {
         return other instanceof CheckOptions options
                 && emptySelectionPolicy == options.emptySelectionPolicy
-                && allowIncompleteAnalysis == options.allowIncompleteAnalysis;
+                && allowIncompleteAnalysis == options.allowIncompleteAnalysis
+                && logging.equals(options.logging);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(emptySelectionPolicy, allowIncompleteAnalysis);
+        return Objects.hash(emptySelectionPolicy, allowIncompleteAnalysis, logging);
     }
 
     @Override
@@ -62,12 +71,14 @@ public final class CheckOptions {
     public static final class Builder {
         private EmptySelectionPolicy emptySelectionPolicy = EmptySelectionPolicy.FAIL;
         private boolean allowIncompleteAnalysis;
+        private AnalysisLogging logging = AnalysisLogging.disabled();
 
         private Builder() {}
 
         private Builder(CheckOptions options) {
             emptySelectionPolicy = options.emptySelectionPolicy;
             allowIncompleteAnalysis = options.allowIncompleteAnalysis;
+            logging = options.logging;
         }
 
         public Builder allowEmptySelection(boolean value) {
@@ -87,6 +98,11 @@ public final class CheckOptions {
 
         public CheckOptions build() {
             return new CheckOptions(this);
+        }
+
+        public Builder logging(AnalysisLogging value) {
+            logging = Objects.requireNonNull(value, "logging");
+            return this;
         }
     }
 }
