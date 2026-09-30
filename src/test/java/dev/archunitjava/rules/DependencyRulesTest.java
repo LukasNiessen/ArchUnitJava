@@ -65,6 +65,27 @@ class DependencyRulesTest {
     }
 
     @Test
+    void loggingExplainsSelectionAndFiltersWithoutChangingPolicyResults() {
+        var rule = DependencyRules.types(model, graph, binary("api.A"), binary("api.B"),
+                DependencyRuleSpec.noDependencies()
+                        .withExternalDependencies(ExternalDependencyPolicy.IGNORE));
+        var expected = rule.check();
+        for (var level : dev.archunitjava.diagnostics.LogLevel.values()) {
+            var events = new java.util.ArrayList<dev.archunitjava.diagnostics.AnalysisEvent>();
+            var options = CheckOptions.builder().logging(
+                    dev.archunitjava.diagnostics.AnalysisLogging.of(level, events::add)).build();
+            assertEquals(expected, rule.check(options));
+            if (level == dev.archunitjava.diagnostics.LogLevel.DEBUG) {
+                assertTrue(events.stream().anyMatch(event -> event.message().equals("Selected subjects")));
+                assertTrue(events.stream().anyMatch(event -> event.message().equals("Dependency filter")
+                        && event.details().get("decision").equals("self dependency ignored")));
+                assertTrue(events.stream().anyMatch(event -> event.message().equals("Dependency evidence")));
+                assertTrue(events.stream().anyMatch(event -> event.message().equals("Violation evidence")));
+            }
+        }
+    }
+
+    @Test
     void noOnlyAnyAndRequiredPoliciesShareEvidencePreservingResults() {
         TypeSelector a = binary("api.A");
         TypeSelector b = binary("api.B");

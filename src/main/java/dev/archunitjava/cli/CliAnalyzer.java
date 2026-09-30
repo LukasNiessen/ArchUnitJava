@@ -1,6 +1,9 @@
 package dev.archunitjava.cli;
 
 import dev.archunitjava.importer.ClassFileInput;
+import dev.archunitjava.diagnostics.AnalysisInspection;
+import dev.archunitjava.diagnostics.AnalysisLogging;
+import dev.archunitjava.diagnostics.LogLevel;
 import dev.archunitjava.importer.ClassPathImportResolver;
 import dev.archunitjava.importer.ImportResolutionResult;
 import dev.archunitjava.importer.InputDiagnosticCode;
@@ -18,15 +21,31 @@ import java.util.TreeMap;
 public final class CliAnalyzer {
     public CliAnalysisResult analyze(CliConfiguration configuration) {
         CliConfiguration config = Objects.requireNonNull(configuration, "configuration");
+        return analyze(config, config.checkOptions().logging());
+    }
+
+    /** Analyze with an explicit observer without changing the configuration or result schema. */
+    public CliAnalysisResult analyze(CliConfiguration configuration, AnalysisLogging logging) {
+        CliConfiguration config = Objects.requireNonNull(configuration, "configuration");
+        AnalysisLogging log = Objects.requireNonNull(logging, "logging");
+        var options = log == config.checkOptions().logging() ? config.checkOptions()
+                : config.checkOptions().toBuilder().logging(log).build();
+        log.emit(LogLevel.INFO, "EXTRACT", "Import started", () -> Map.of("inputs", "" + config.inputs().size()));
         var imports = new ClassPathImportResolver().resolve(config.inputs().stream()
                 .map(ClassFileInput::path).toList());
+        AnalysisInspection.imports(imports, log);
         var graph = CliGraphBuilder.build(imports.model());
+        AnalysisInspection.graph(graph, log);
         var failures = importFailures(imports);
         var results = CliRuleFactory.createRules(config, imports.model(), graph).stream()
-                .map(rule -> rule.check(config.checkOptions()))
+                .map(rule -> rule.check(options))
                 .map(result -> withImportDiagnostics(result, failures,
                         config.checkOptions().allowIncompleteAnalysis()))
                 .toList();
+        if (!failures.isEmpty()) results.forEach(result -> AnalysisInspection.result(result, log));
+        log.emit(failures.isEmpty() ? LogLevel.INFO : LogLevel.WARN, "REPORT", "Analysis complete", () -> Map.of("rules", "" + results.size(),
+                "passed", "" + results.stream().filter(RuleResult::passed).count(),
+                "importFailures", "" + failures.size()));
         return new CliAnalysisResult(imports, graph, ResultReport.of(results));
     }
 

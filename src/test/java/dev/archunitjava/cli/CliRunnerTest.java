@@ -50,6 +50,37 @@ final class CliRunnerTest {
     }
 
     @Test
+    void debugInspectionPreservesRealBytecodeAnalysisAndStructuredResults() {
+        CliConfiguration config = CliConfigurationLoader.load(configuration, root);
+        var expected = new CliAnalyzer().analyze(config);
+        var events = new java.util.ArrayList<dev.archunitjava.diagnostics.AnalysisEvent>();
+        var actual = new CliAnalyzer().analyze(config, dev.archunitjava.diagnostics.AnalysisLogging.of(
+                dev.archunitjava.diagnostics.LogLevel.DEBUG, events::add));
+        assertEquals(expected.results(), actual.results());
+        assertEquals(expected.graph(), actual.graph());
+        assertEquals(ResultJsonRenderer.render(expected.results()), ResultJsonRenderer.render(actual.results()));
+        for (String message : java.util.List.of("Import started", "Selected resource", "Imported type",
+                "External type", "Graph ready", "Graph node", "Dependency edge", "Selection",
+                "Dependency filter", "Violation", "Analysis complete")) {
+            assertTrue(events.stream().anyMatch(event -> event.message().equals(message)), message);
+        }
+    }
+
+    @Test
+    void incompleteImportLogsTheFinalAdjustedResult() throws IOException {
+        Files.write(classes.resolve("Broken.class"), new byte[] {0, 1, 2, 3});
+        CliConfiguration config = CliConfigurationLoader.load(configuration, root);
+        var events = new java.util.ArrayList<dev.archunitjava.diagnostics.AnalysisEvent>();
+        var actual = new CliAnalyzer().analyze(config, dev.archunitjava.diagnostics.AnalysisLogging.of(
+                dev.archunitjava.diagnostics.LogLevel.DEBUG, events::add));
+        assertEquals(new CliAnalyzer().analyze(config).results(), actual.results());
+        assertEquals("INCOMPLETE", events.stream().filter(event -> event.message().equals("Rule complete"))
+                .toList().getLast().details().get("status"));
+        assertTrue(events.stream().anyMatch(event -> event.message().equals("Class file diagnostic")
+                && event.level() == dev.archunitjava.diagnostics.LogLevel.ERROR));
+    }
+
+    @Test
     void checkUsesTheSameResultsAsThePublicJavaApi() {
         CliConfiguration config = CliConfigurationLoader.load(configuration, root);
         String expected = ResultJsonRenderer.render(new CliAnalyzer().analyze(config).results());

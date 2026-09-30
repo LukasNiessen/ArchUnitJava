@@ -4,6 +4,8 @@ import dev.archunitjava.result.Diagnostic;
 import dev.archunitjava.result.RuleResult;
 import dev.archunitjava.result.Violation;
 import java.util.Objects;
+import java.util.List;
+import java.util.Map;
 
 /** Bounded, deterministic plain-text output for people and terminal CI logs. */
 public final class ConsoleResultRenderer {
@@ -27,6 +29,43 @@ public final class ConsoleResultRenderer {
             diagnostics(out, result, bounds);
         }
         return out.toString();
+    }
+
+    /** Opt-in formatted report; the existing render overloads retain their plain-text contract. */
+    public static String renderPretty(ResultReport report, ConsoleColor color) {
+        return renderPretty(report, ResultRenderLimits.defaults(), color, System.console() != null, System.getenv());
+    }
+
+    /** Renders with explicit limits and terminal context; labels are always escaped before styling. */
+    public static String renderPretty(ResultReport report, ResultRenderLimits limits,
+            ConsoleColor color, boolean terminal, Map<String, String> environment) {
+        Objects.requireNonNull(report, "report");
+        Objects.requireNonNull(limits, "limits");
+        boolean useColor = Objects.requireNonNull(color, "color").enabled(terminal, environment);
+        StringBuilder out = new StringBuilder(ConsoleText.style("ARCHUNITJAVA | Architecture report", "1;36", useColor))
+                .append('\n').append("=====================================\n");
+        for (RuleResult result : report.results()) {
+            String plain = render(ResultReport.of(List.of(result)), limits);
+            int newline = plain.indexOf('\n');
+            String code = switch (result.status()) {
+                case PASSED -> "1;32";
+                case FAILED, INCOMPLETE -> "1;31";
+                case SKIPPED -> "1;33";
+            };
+            out.append(ConsoleText.style(ConsoleText.sanitize(plain.substring(0, newline)), code, useColor))
+                    .append('\n');
+            plain.substring(newline + 1).lines().forEach(line ->
+                    out.append(ConsoleText.sanitize(line)).append('\n'));
+            result.metadata().rationale().ifPresent(reason -> out.append("  Because: ")
+                    .append(ConsoleText.sanitize(reason)).append('\n'));
+            out.append('\n');
+        }
+        out.append("Summary:");
+        for (var status : dev.archunitjava.result.RuleStatus.values()) {
+            out.append(' ').append(status).append('=')
+                    .append(report.results().stream().filter(result -> result.status() == status).count());
+        }
+        return out.append('\n').toString();
     }
 
     private static String marker(RuleResult result) {
