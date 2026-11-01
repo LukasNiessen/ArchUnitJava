@@ -7,6 +7,9 @@ uses semantic versioning for public releases.
 
 ### Fixed
 
+- preserve ordinary member-owned dependencies in type and package cycle checks when synthetic
+  edges are ignored (the default), and exclude synthetic member evidence correctly; checks may
+  now report real cycles that `0.1.0` silently missed;
 - accept documented dotted CLI rule IDs while still rejecting unknown rule fields;
 - retain input and parser failures in CLI/direct `CliAnalyzer` results so corrupt archives or
   malformed classes cannot silently produce passing partial checks; and

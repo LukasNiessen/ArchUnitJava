@@ -294,7 +294,9 @@ public final class CycleRules {
                             && syntheticMembers.contains(member));
             edge.evidence().stream()
                     .filter(evidence -> !syntheticOrigin
-                            && evidence.ownerMember().map(syntheticMembers::contains).orElse(true))
+                            && evidence.ownerMember()
+                                    .map(member -> !syntheticMembers.contains(member))
+                                    .orElse(true))
                     .forEach(evidence -> result.addDependency(
                             edge.origin(), edge.target(), edge.kind(), evidence));
         }

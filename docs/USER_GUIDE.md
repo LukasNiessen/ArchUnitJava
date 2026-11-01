@@ -105,6 +105,13 @@ These entry points are all under the
 The generated Javadocs list the overloads and option values. Prefer a narrow selector and an
 explicit external-dependency policy over broad patterns that happen to pass today.
 
+Type and package cycle rules ignore evidence from synthetic types, synthetic members, and bridge
+methods by default. Ordinary member-owned dependencies remain part of the graph, including an edge
+that has both ordinary and synthetic evidence. Evidence without an owning member is retained unless
+the edge itself originates from a synthetic type or member. Use
+`CycleRuleOptions.withSyntheticEdges(SyntheticEdgePolicy.INCLUDE)` to include generated evidence;
+type-use dependencies such as field types are controlled separately and are included by default.
+
 ## Layers, slices, modules, and PlantUML
 
 Layers and slices are projections over the imported dependency graph. Define membership first,
