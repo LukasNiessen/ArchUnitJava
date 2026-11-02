@@ -4,9 +4,13 @@ ArchUnitJava `0.1.0` is a **public beta**. It is useful for evaluation and new a
 suites, but its pre-1.0 Java API may change between minor versions. The established ArchUnit
 library remains the mature default for production Java systems.
 
+Current source prepares `1.0.0-SNAPSHOT`. Properties cycle rules and the corrected cycle filtering
+are development-candidate features; published `0.1.0` does not include them. See the
+[v1 checklist](V1_READINESS.md) before choosing a release candidate for production.
+
 This guide maps each important feature to its normal workflow. The
 [five-minute quickstart](../README.md#-five-minute-quickstart) remains the shortest path to a first
-passing rule, while the [generated API reference](https://lukasniessen.github.io/ArchUnitJava/api/)
+passing rule, while the [generated API reference](https://dragonsec-ai.github.io/ArchUnitJava/api/)
 documents every public package and type.
 
 ## Choose an integration path
@@ -20,7 +24,7 @@ documents every public package and type.
 | A dependency diagram | The `graph` command or a graph renderer |
 
 The properties interface is intentionally smaller than the Java API. It is non-executable,
-strictly validated, and currently supports dependency rules over type and package graphs. Do not
+strictly validated, and supports dependency and cycle rules over type and package graphs. Do not
 expect every lower-level Java rule to have a properties equivalent.
 
 ## Install and run a first rule
@@ -60,7 +64,7 @@ Important behavior:
 - import filters and `.archignore` can remove intentional inputs; and
 - approved roots and resource limits constrain paths, archives, diagnostics, and caches.
 
-Start with the [`importer` API](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/importer/package-summary.html)
+Start with the [`importer` API](https://dragonsec-ai.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/importer/package-summary.html)
 for custom imports. Read the [compatibility contract](COMPATIBILITY.md) before claiming support for
 another runtime, compiler, or class-file version.
 
@@ -76,7 +80,7 @@ The properties interface accepts only:
 - bounded globs such as `glob:com.example.api.**`.
 
 The Java API additionally provides semantic selectors and a deliberately named trusted-regex path.
-Use [`TypeSelector`](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/selector/TypeSelector.html)
+Use [`TypeSelector`](https://dragonsec-ai.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/selector/TypeSelector.html)
 and the surrounding `selector` package as the lower-level starting point. Empty selections fail by
 default so a renamed or removed package cannot silently disable a policy.
 
@@ -101,7 +105,7 @@ an explicit passed, failed, skipped, or incomplete status.
 | Diagrams and presets | PlantUML adherence and reusable policy sets | `PlantUmlRules`, the `presets` package |
 
 These entry points are all under the
-[`rules` API package](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/rules/package-summary.html).
+[`rules` API package](https://dragonsec-ai.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/rules/package-summary.html).
 The generated Javadocs list the overloads and option values. Prefer a narrow selector and an
 explicit external-dependency policy over broad patterns that happen to pass today.
 
@@ -111,6 +115,10 @@ that has both ordinary and synthetic evidence. Evidence without an owning member
 the edge itself originates from a synthetic type or member. Use
 `CycleRuleOptions.withSyntheticEdges(SyntheticEdgePolicy.INCLUDE)` to include generated evidence;
 type-use dependencies such as field types are controlled separately and are included by default.
+
+The properties path also supports `rule.<id>.kind=cycles`; see the complete
+[cycle configuration example](CLI_REFERENCE.md#cycle-rules). Cycle traversal uses explicit stacks,
+including on deep graphs; bounded representative diagnostics do not weaken SCC detection.
 
 ## Layers, slices, modules, and PlantUML
 
@@ -124,7 +132,7 @@ opens, uses, and provides relationships rather than reducing modules to packages
 PlantUML support parses a bounded component diagram subset. Use it when the diagram is the reviewed
 contract; choose an explicit policy for types or dependencies that do not map to a diagram
 component. See the
-[`diagram.plantuml` API](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/diagram/plantuml/package-summary.html).
+[`diagram.plantuml` API](https://dragonsec-ai.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/diagram/plantuml/package-summary.html).
 
 ## JUnit integration
 
@@ -153,7 +161,7 @@ can override configured result or graph formats without changing policy semantic
 CSV is spreadsheet-safe by default. The explicitly named `renderMachineReadable` API preserves
 lossless values and must be handled as data rather than opened directly in a spreadsheet. Renderer
 entry points are in the
-[`report` API](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/report/package-summary.html).
+[`report` API](https://dragonsec-ai.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/report/package-summary.html).
 
 ## Baselines and suppressions
 
@@ -164,7 +172,7 @@ a bounded strict parser.
 
 Treat a baseline change as an architecture decision: review it in the same pull request as the code
 that changes the finding. Start with the
-[`baseline` API](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/baseline/package-summary.html)
+[`baseline` API](https://dragonsec-ai.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/baseline/package-summary.html)
 and the staged workflow in [Migration and adoption](MIGRATION.md).
 
 ## Metrics and performance evidence
@@ -200,5 +208,5 @@ contracts are in [`build-integrations/maven`](../build-integrations/maven) and
 The exact configuration keys and CLI behavior are documented in the
 [CLI configuration reference](CLI_REFERENCE.md). Security-sensitive limits and residual risks are
 documented in the [threat model](THREAT_MODEL.md). For unresolved questions, use
-[GitHub Discussions](https://github.com/LukasNiessen/ArchUnitJava/discussions) or open an issue as
+[GitHub Discussions](https://github.com/dragonsec-ai/ArchUnitJava/discussions) or open an issue as
 described in [SUPPORT.md](../SUPPORT.md).

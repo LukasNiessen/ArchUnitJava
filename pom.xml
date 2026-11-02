@@ -6,10 +6,10 @@
 
   <groupId>io.github.tristankruse</groupId>
   <artifactId>archunitjava</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <name>ArchUnitJava</name>
   <description>Public-beta static architecture analysis and executable architecture policies for Java</description>
-  <url>https://github.com/LukasNiessen/ArchUnitJava</url>
+  <url>https://github.com/dragonsec-ai/ArchUnitJava</url>
 
   <licenses>
     <license>
@@ -39,9 +39,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:https://github.com/LukasNiessen/ArchUnitJava.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/LukasNiessen/ArchUnitJava.git</developerConnection>
-    <url>https://github.com/LukasNiessen/ArchUnitJava</url>
+    <connection>scm:git:https://github.com/dragonsec-ai/ArchUnitJava.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/dragonsec-ai/ArchUnitJava.git</developerConnection>
+    <url>https://github.com/dragonsec-ai/ArchUnitJava</url>
     <tag>v${project.version}</tag>
   </scm>
 

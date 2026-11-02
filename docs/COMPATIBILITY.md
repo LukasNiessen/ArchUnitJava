@@ -36,6 +36,38 @@ development candidates. Release notes must identify them. ArchUnitJava does not 
 with the original ArchUnit API or its rule semantics. Configuration and report formats carry their
 own schema versions and reject unknown schemas where ingestion exists.
 
+## Version 1 contract (candidate)
+
+The development version is `1.0.0-SNAPSHOT`; the public registry still contains the `0.1.0` beta.
+These promises become effective with publication of `1.0.0`, after the
+[candidate gates](V1_READINESS.md) pass:
+
+- Public/protected declarations in the primary artifact form the supported Java API. Package-private
+  implementation and generated files are excluded. Public records' constructors/components are
+  API, including the preserved pre-cycle `CliRuleConfiguration` constructor.
+- Compatible additions may ship in minor releases. Removing or changing existing signatures,
+  changing required configuration fields, raising the runtime floor, or making other incompatible
+  contract changes requires a major release. Fixing a documented rule's incorrect result is a bug
+  fix: cycle checks may correctly fail after an upgrade when earlier versions missed a violation.
+- The v1 runtime/build baseline is JDK 25, with supported analyzed `javac` releases 8–25 as above.
+  Other runtimes, compilers, obfuscators and future class-file versions are not promised.
+- Maven coordinates remain `io.github.tristankruse:archunitjava` despite the organization transfer.
+  The automatic module name remains `dev.archunitjava`. Consumers need no publishing account.
+- Existing `archunitjava.cli.v1` dependency configurations keep their defaults. The new cycle kind is
+  additive; older beta readers reject that new field. Incompatible ingestion changes use a new
+  schema. CLI exit codes 0/2/3/4/5 preserve their documented meanings.
+- Structured report IDs and schema-versioned fields are contracts; exact human prose, stack traces,
+  wall times, HTML/CSS layout and diagnostic ordering beyond documented deterministic sorting are
+  not byte-for-byte compatibility promises. Consumers should tolerate additive output fields.
+- No Java serialization format, original ArchUnit API compatibility, complete dynamic-dependency
+  detection, or fixed performance/heap guarantee is promised.
+
+`scripts/check-public-api.ps1` extracts public/protected declarations, descriptors, generic
+signatures and constants using JDK 25 `javap` without initializing the analyzed classes. CI checks
+them against `docs/api/v1-public-api.txt`. The gate deliberately flags additions too, requiring a
+reviewed `-Update` change. It is a signature regression gate, not a proof of every behavioral or
+binary compatibility property: tests and release review still cover semantics and schemas.
+
 ## Decision
 
 The `0.1.x` line retains JDK 25 instead of adding a third-party parser solely to lower the

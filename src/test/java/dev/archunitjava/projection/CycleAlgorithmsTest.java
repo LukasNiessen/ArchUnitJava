@@ -77,6 +77,50 @@ class CycleAlgorithmsTest {
         assertTrue(bounded.traversedEdges() <= 100);
     }
 
+    @Test
+    void tenThousandNodeChainDoesNotConsumeTheCallStack() {
+        var result = CycleAlgorithms.analyze(longGraph(10_000, false),
+                CycleEnumerationOptions.componentsOnly());
+        assertEquals(10_000, result.components().size());
+        assertTrue(result.cyclicComponents().isEmpty());
+    }
+
+    @Test
+    void tenThousandNodeRingRetainsConnectivityWhenEvidenceIsBounded() {
+        var result = CycleAlgorithms.analyze(longGraph(10_000, true),
+                CycleEnumerationOptions.bounded(1, 32, 50));
+        assertEquals(1, result.cyclicComponents().size());
+        assertEquals(10_000, result.cyclicComponents().getFirst().nodes().size());
+        assertTrue(result.cycles().isEmpty());
+        assertTrue(result.enumerationTruncated());
+        assertTrue(result.traversedEdges() <= 50);
+    }
+
+    @Test
+    void longExplicitCyclePathsDoNotConsumeTheCallStack() {
+        var result = CycleAlgorithms.analyze(longGraph(10_000, true),
+                CycleEnumerationOptions.bounded(1, 10_000, 10_001));
+        assertEquals(1, result.cycles().size());
+        assertEquals(10_000, result.cycles().getFirst().nodes().size());
+        assertTrue(result.enumerationTruncated());
+        assertEquals(10_001, result.traversedEdges());
+    }
+
+    private static DependencyGraph longGraph(int size, boolean ring) {
+        var nodes = java.util.stream.IntStream.range(0, size)
+                .mapToObj(index -> TypeId.ofBinaryName("deep.N" + String.format(java.util.Locale.ROOT,
+                        "%05d", index))).toList();
+        var builder = DependencyGraph.builder();
+        nodes.forEach(builder::addNode);
+        for (int index = 1; index < size; index++) {
+            builder.addDependency(nodes.get(index - 1), nodes.get(index),
+                    DependencyKind.METHOD_CALL, EVIDENCE);
+        }
+        if (ring) builder.addDependency(nodes.getLast(), nodes.getFirst(),
+                DependencyKind.METHOD_CALL, EVIDENCE);
+        return builder.build();
+    }
+
     private static DependencyGraph graph(boolean reversed) {
         List<TypeId> nodes = new ArrayList<>(List.of(A, B, C, D, ISOLATED));
         List<List<TypeId>> edges = new ArrayList<>(List.of(

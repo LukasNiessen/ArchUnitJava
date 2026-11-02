@@ -5,6 +5,7 @@ import dev.archunitjava.model.TypeModelResult;
 import dev.archunitjava.rules.ArchitectureRule;
 import dev.archunitjava.rules.DependencyRuleSpec;
 import dev.archunitjava.rules.DependencyRules;
+import dev.archunitjava.rules.CycleRules;
 import dev.archunitjava.selector.PackageSelector;
 import dev.archunitjava.selector.TypeSelector;
 import java.util.ArrayList;
@@ -25,7 +26,13 @@ public final class CliRuleFactory {
             DependencyRuleSpec spec = new DependencyRuleSpec(
                     definition.mode(), definition.selfDependencies(),
                     definition.externalDependencies());
-            ArchitectureRule rule = switch (definition.domain()) {
+            ArchitectureRule rule = definition.kind() == CliRuleKind.CYCLES
+                    ? switch (definition.domain()) {
+                        case TYPES -> CycleRules.typesAreAcyclic(model, graph,
+                                TypeSelector.binaryName(definition.origins().toJavaPattern()));
+                        case PACKAGES -> CycleRules.packagesAreAcyclic(model, graph,
+                                PackageSelector.name(definition.origins().toJavaPattern()));
+                    } : switch (definition.domain()) {
                 case TYPES -> DependencyRules.types(
                         model,
                         graph,

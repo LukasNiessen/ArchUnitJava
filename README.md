@@ -7,13 +7,13 @@
 <!-- spacer -->
 <p></p>
 
-[![CI](https://github.com/LukasNiessen/ArchUnitJava/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/LukasNiessen/ArchUnitJava/actions/workflows/ci.yml?query=branch%3Amain)
-[![Documentation](https://github.com/LukasNiessen/ArchUnitJava/actions/workflows/docs.yml/badge.svg)](https://lukasniessen.github.io/ArchUnitJava/)
+[![CI](https://github.com/dragonsec-ai/ArchUnitJava/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/dragonsec-ai/ArchUnitJava/actions/workflows/ci.yml?query=branch%3Amain)
+[![Documentation](https://github.com/dragonsec-ai/ArchUnitJava/actions/workflows/docs.yml/badge.svg)](https://dragonsec-ai.github.io/ArchUnitJava/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Java 25](https://img.shields.io/badge/Java-25-E76F00?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/25/)
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.tristankruse/archunitjava.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.tristankruse/archunitjava/0.1.0)
 [![Status: public beta](https://img.shields.io/badge/status-public%20beta-f89820)](docs/RELEASE.md)
-[![GitHub stars](https://img.shields.io/github/stars/LukasNiessen/ArchUnitJava.svg)](https://github.com/LukasNiessen/ArchUnitJava)
+[![GitHub stars](https://img.shields.io/github/stars/dragonsec-ai/ArchUnitJava.svg)](https://github.com/dragonsec-ai/ArchUnitJava)
 
 </div>
 
@@ -27,6 +27,11 @@ deterministic policies, and produces evidence for JUnit and CI.
 > in the [release assessment](docs/RELEASE.md). The pre-1.0 API remains provisional and may change
 > between minor versions.
 
+The current source prepares **1.0.0**. See the [release checklist](docs/V1_READINESS.md) and
+[family feature comparison](docs/V1_FEATURE_COMPARISON.md). The cycle-evidence correction and
+properties cycle rules described there require the development candidate; they are absent from
+the published `0.1.0` beta.
+
 _Inspired by the established [ArchUnit](https://www.archunit.org/) project, but independently
 implemented and not affiliated with ArchUnit. This is not a drop-in replacement._
 
@@ -34,7 +39,7 @@ implemented and not affiliated with ArchUnit. This is not a drop-in replacement.
 [Capabilities](#-capabilities) · [Inspection](#-logging-and-inspection) · [Reports](#-reports) ·
 [Example repository](#-independent-example-repository) ·
 [User guide](docs/USER_GUIDE.md) · [CLI reference](docs/CLI_REFERENCE.md) ·
-[Documentation](https://lukasniessen.github.io/ArchUnitJava/) ·
+[Documentation](https://dragonsec-ai.github.io/ArchUnitJava/) ·
 [FAQ](#-faq) · [Contributing](CONTRIBUTING.md) ·
 [Support](SUPPORT.md) · [Limitations](#-current-limitations) ·
 [Adoption metrics](#-adoption-metrics)
@@ -219,7 +224,7 @@ analysis failure (`4`), and policy violations (`5`).
 | Metrics | Source, cohesion, and dependency metrics with deterministic snapshots |
 | Operational controls | Bounded diagnostics, import filters, `.archignore`, cache keys, resource and path limits |
 
-The [generated API reference](https://lukasniessen.github.io/ArchUnitJava/api/) lists every public
+The [generated API reference](https://dragonsec-ai.github.io/ArchUnitJava/api/) lists every public
 package and type. The [user guide](docs/USER_GUIDE.md) maps every important feature area to its
 normal workflow and API entry point; the [CLI reference](docs/CLI_REFERENCE.md) documents every
 configuration key, command, format, and exit code. The internal architecture and ownership rules
@@ -227,7 +232,7 @@ are described in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## 🔎 Logging and inspection
 
-> These logging and pretty-report APIs require **0.2.0 or later**, or a build of
+> These logging and pretty-report APIs require the **unreleased 1.0 candidate**, or a build of
 > the current `main` branch from source. The published **0.1.0** artifact used in
 > the quickstart does not include them.
 
@@ -461,7 +466,7 @@ change should include a focused regression test, and packaging or integration ch
 be verified against the independent RAG consumer.
 
 Please report vulnerabilities through GitHub's private
-[security-advisory form](https://github.com/LukasNiessen/ArchUnitJava/security/advisories/new), not a
+[security-advisory form](https://github.com/dragonsec-ai/ArchUnitJava/security/advisories/new), not a
 public issue. The supported scope and reporting guidance are in [SECURITY.md](SECURITY.md).
 
 ## ⚖️ Should I use this or ArchUnit?
@@ -536,9 +541,9 @@ ArchUnitJava is maintained by [Lukas Niessen](https://github.com/LukasNiessen), 
 To participate:
 
 - read the [support policy](SUPPORT.md) for usage questions and bug reports;
-- join [GitHub Discussions](https://github.com/LukasNiessen/ArchUnitJava/discussions) for usage and design questions;
-- [open an issue](https://github.com/LukasNiessen/ArchUnitJava/issues/new/choose) for a reproducible bug or feature;
-- [review existing issues](https://github.com/LukasNiessen/ArchUnitJava/issues); or
+- join [GitHub Discussions](https://github.com/dragonsec-ai/ArchUnitJava/discussions) for usage and design questions;
+- [open an issue](https://github.com/dragonsec-ai/ArchUnitJava/issues/new/choose) for a reproducible bug or feature;
+- [review existing issues](https://github.com/dragonsec-ai/ArchUnitJava/issues); or
 - contribute code or documentation through a pull request.
 
 Participation is governed by the [code of conduct](CODE_OF_CONDUCT.md). Report vulnerabilities
@@ -557,7 +562,7 @@ workflow.
 ## 📄 License
 
 The current development version is licensed under the [MIT License](LICENSE). The published
-[`0.1.0` release](https://github.com/LukasNiessen/ArchUnitJava/blob/v0.1.0/LICENSE) remains under
+[`0.1.0` release](https://github.com/dragonsec-ai/ArchUnitJava/blob/v0.1.0/LICENSE) remains under
 the Apache License 2.0; released artifacts keep the license under which they were published.
 
 <div align="right">

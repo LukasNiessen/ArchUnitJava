@@ -5,11 +5,17 @@ uses semantic versioning for public releases.
 
 ## [Unreleased]
 
+### Added
+
+- declarative type/package cycle rules with `kind=cycles` in the properties/JUnit integration;
+- an explicit v1 compatibility scope and public/protected API signature regression gate.
+
 ### Fixed
 
 - preserve ordinary member-owned dependencies in type and package cycle checks when synthetic
   edges are ignored (the default), and exclude synthetic member evidence correctly; checks may
   now report real cycles that `0.1.0` silently missed;
+- avoid call-stack overflow in SCC detection and bounded cycle enumeration on deep graphs;
 - accept documented dotted CLI rule IDs while still rejecting unknown rule fields;
 - retain input and parser failures in CLI/direct `CliAnalyzer` results so corrupt archives or
   malformed classes cannot silently produce passing partial checks; and
@@ -56,5 +62,5 @@ uses semantic versioning for public releases.
 - The performance corpus is regression evidence, not an absolute scalability claim.
 - Unrestricted regex and lossless non-neutralized CSV require explicitly named trusted APIs.
 
-[Unreleased]: https://github.com/LukasNiessen/ArchUnitJava/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/LukasNiessen/ArchUnitJava/releases/tag/v0.1.0
+[Unreleased]: https://github.com/dragonsec-ai/ArchUnitJava/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/dragonsec-ai/ArchUnitJava/releases/tag/v0.1.0

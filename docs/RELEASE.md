@@ -1,5 +1,9 @@
 # Release status
 
+The next release is the `1.0.0` candidate. Its current evidence and remaining go/no-go gates are
+tracked in [V1_READINESS.md](V1_READINESS.md). The record below describes the immutable published
+beta; its test counts and account configuration are historical, not current candidate evidence.
+
 **Decision: PUBLISHED PUBLIC BETA.** Version `0.1.0` became publicly available from Maven Central on
 2026-09-01.
 
@@ -76,7 +80,7 @@ Publication evidence:
 - Signed tag `v0.1.0` resolves to reviewed commit
   `631e4506e99b8604b096971792fadba9e5edb55d`; independent GPG verification returned `GOODSIG` and
   `VALIDSIG` for the dedicated signing-key fingerprint.
-- [GitHub Actions staging run 33523489977](https://github.com/LukasNiessen/ArchUnitJava/actions/runs/33523489977)
+- [GitHub Actions staging run 33523489977](https://github.com/dragonsec-ai/ArchUnitJava/actions/runs/33523489977)
   verified the tag, materialized `0.1.0`, ran 347 tests with zero failures or errors, signed the four
   release artifacts, uploaded the bundle, and waited for Central validation.
 - Central deployment `12dfc7c7-4015-4fbf-887e-bc3103ff6560` validated one out of one components and

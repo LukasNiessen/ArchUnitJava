@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
 
-/** Whitelisted declarative configuration for the supported dependency-rule subset. */
+/** Whitelisted declarative dependency or cycle rule configuration. */
 public record CliRuleConfiguration(
         String id,
         CliGraphDomain domain,
@@ -21,7 +21,18 @@ public record CliRuleConfiguration(
         Optional<String> displayName,
         Optional<String> rationale,
         List<String> tags,
-        Severity severity) implements Comparable<CliRuleConfiguration> {
+        Severity severity,
+        CliRuleKind kind) implements Comparable<CliRuleConfiguration> {
+    /** Retains the dependency-rule constructor used before cycle configurations were introduced. */
+    public CliRuleConfiguration(
+            String id, CliGraphDomain domain, DependencyRuleMode mode, CliPattern origins,
+            CliPattern targets, SelfDependencyPolicy selfDependencies,
+            ExternalDependencyPolicy externalDependencies, Optional<String> displayName,
+            Optional<String> rationale, List<String> tags, Severity severity) {
+        this(id, domain, mode, origins, targets, selfDependencies, externalDependencies,
+                displayName, rationale, tags, severity, CliRuleKind.DEPENDENCY);
+    }
+
     public CliRuleConfiguration {
         if (id == null || !id.matches("[A-Za-z0-9._-]{1,64}")) {
             throw new CliConfigurationException("Invalid rule id: " + id);
@@ -44,6 +55,12 @@ public record CliRuleConfiguration(
         }
         tags = List.copyOf(normalizedTags);
         Objects.requireNonNull(severity, "severity");
+        Objects.requireNonNull(kind, "kind");
+        if (kind == CliRuleKind.CYCLES && (mode != DependencyRuleMode.NO
+                || !origins.equals(targets) || selfDependencies != SelfDependencyPolicy.IGNORE
+                || externalDependencies != ExternalDependencyPolicy.IGNORE)) {
+            throw new CliConfigurationException("Cycle rules use one induced selection and default cycle policies");
+        }
     }
 
     @Override
