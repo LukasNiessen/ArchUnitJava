@@ -18,7 +18,9 @@ and [the compatibility contract](COMPATIBILITY.md).
   `fc7970533be9e41f9961b7303fa77d0170a4f441c31ea6e85057effcdfc2f555`, zero analysis errors/missing classes.
 - [x] API baseline matches 478 public/protected types; an incompatible baseline is rejected.
 - [x] Independently compiled basic example (one test) and RAG consumer (five tests) pass.
-- [ ] Primary artifact is byte-for-byte reproducible; docs site assembles with valid local links.
+- [x] Primary artifact is byte-for-byte reproducible across clean local builds (SHA-256
+  `b91178bc2c400674245720fe19e11cce1fce11607e88ea5cf15c339eb9e4cdd8`);
+  docs site assembles with valid local links.
 - [ ] Final integrated Linux/Windows CI and CodeQL pass.
 - [ ] Signed exact-commit tag and protected Central staging validate the prospective `1.0.0` bundle;
   a maintainer reviews signatures, checksums, metadata and immutable coordinates before publication.
