@@ -21,7 +21,14 @@ and [the compatibility contract](COMPATIBILITY.md).
 - [x] Primary artifact is byte-for-byte reproducible across clean local builds (SHA-256
   `b91178bc2c400674245720fe19e11cce1fce11607e88ea5cf15c339eb9e4cdd8`);
   docs site assembles with valid local links.
-- [ ] Final integrated Linux/Windows CI and CodeQL pass.
+- [x] Final candidate CI passes on Linux/Windows, including both independent RAG consumers and
+  release dry runs; CodeQL passes. Evidence for reviewed head
+  `6b0be56e3f304ca3b844366a2984e1266f1836cc`:
+  [CI](https://github.com/dragonsec-ai/ArchUnitJava/actions/runs/41524443955),
+  [push CI](https://github.com/dragonsec-ai/ArchUnitJava/actions/runs/41524435589),
+  [CodeQL](https://github.com/dragonsec-ai/ArchUnitJava/actions/runs/41524444110).
+  [PR #90](https://github.com/dragonsec-ai/ArchUnitJava/pull/90) merged this tree to main as
+  `89ba4d7932c84f1404714519e673f55273aca8bc`.
 - [ ] Signed exact-commit tag and protected Central staging validate the prospective `1.0.0` bundle;
   a maintainer reviews signatures, checksums, metadata and immutable coordinates before publication.
 
