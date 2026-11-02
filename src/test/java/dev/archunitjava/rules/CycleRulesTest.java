@@ -36,8 +36,11 @@ class CycleRulesTest {
     private static final TypeId C = TypeId.ofBinaryName("app.C");
     private static final TypeId D = TypeId.ofBinaryName("other.D");
     private static final TypeId GENERATED = TypeId.ofBinaryName("app.Generated");
+    private static final MemberId A_WORK = MemberId.of(A, "work", "()V");
     private static final MemberId A_BRIDGE = MemberId.of(A, "bridge", "()V");
+    private static final MemberId A_SYNTHETIC = MemberId.of(A, "generated", "()V");
     private static final MemberId B_WORK = MemberId.of(B, "work", "()V");
+    private static final MemberId D_WORK = MemberId.of(D, "work", "()V");
     private static final MemberId GENERATED_WORK = MemberId.of(GENERATED, "work", "()V");
 
     @TempDir Path temporaryDirectory;
@@ -133,9 +136,90 @@ class CycleRulesTest {
     }
 
     @Test
+    void ordinaryMemberEvidenceIsRetainedUnderEverySyntheticPolicy() {
+        DependencyEvidence outward = evidence(A_WORK, 10);
+        DependencyEvidence inward = evidence(B_WORK, 20);
+        DependencyGraph graph = DependencyGraph.builder()
+                .addNode(A).addNode(B)
+                .addDependency(A, B, DependencyKind.METHOD_CALL, outward)
+                .addDependency(B, A, DependencyKind.METHOD_CALL, inward)
+                .build();
+
+        assertEquals(RuleStatus.FAILED,
+                CycleRules.typesAreAcyclic(model, graph, packages("app")).check().status());
+        for (SyntheticEdgePolicy policy : SyntheticEdgePolicy.values()) {
+            var result = CycleRules.typesAreAcyclic(model, graph, packages("app"),
+                    CycleRuleOptions.defaults().withSyntheticEdges(policy)).check();
+            assertEquals(RuleStatus.FAILED, result.status(), policy.name());
+            assertEquals(1, result.violations().size());
+            assertEquals(List.of(outward, inward), result.violations().getFirst().evidence());
+        }
+    }
+
+    @Test
+    void syntheticMemberEvidenceCannotCreateAnOrdinaryTypeCycle() {
+        for (MemberId owner : List.of(A_BRIDGE, A_SYNTHETIC)) {
+            DependencyGraph graph = DependencyGraph.builder()
+                    .addNode(A).addNode(B)
+                    .addDependency(A, B, DependencyKind.METHOD_CALL, evidence(owner, 10))
+                    .addDependency(B, A, DependencyKind.METHOD_CALL, evidence(null, 20))
+                    .build();
+
+            assertEquals(RuleStatus.PASSED,
+                    CycleRules.typesAreAcyclic(model, graph, packages("app")).check().status(),
+                    owner.stableKey());
+            var included = CycleRules.typesAreAcyclic(model, graph, packages("app"),
+                    CycleRuleOptions.defaults().withSyntheticEdges(SyntheticEdgePolicy.INCLUDE))
+                    .check();
+            assertEquals(RuleStatus.FAILED, included.status());
+            assertEquals(1, included.violations().size());
+        }
+    }
+
+    @Test
+    void mixedEvidenceKeepsTheOrdinaryCycleAndDropsOnlySyntheticOwners() {
+        DependencyEvidence ordinary = evidence(A_WORK, 10);
+        DependencyEvidence synthetic = evidence(A_BRIDGE, 20);
+        DependencyEvidence reverse = evidence(B_WORK, 30);
+        DependencyGraph graph = DependencyGraph.builder()
+                .addNode(A).addNode(B)
+                .addDependency(A, B, DependencyKind.METHOD_CALL, ordinary)
+                .addDependency(A, B, DependencyKind.METHOD_CALL, synthetic)
+                .addDependency(B, A, DependencyKind.METHOD_CALL, reverse)
+                .build();
+
+        var ignored = CycleRules.typesAreAcyclic(model, graph, packages("app")).check();
+        assertEquals(RuleStatus.FAILED, ignored.status());
+        assertEquals(List.of(ordinary, reverse), ignored.violations().getFirst().evidence());
+        var included = CycleRules.typesAreAcyclic(model, graph, packages("app"),
+                CycleRuleOptions.defaults().withSyntheticEdges(SyntheticEdgePolicy.INCLUDE)).check();
+        assertEquals(RuleStatus.FAILED, included.status());
+        assertEquals(List.of(ordinary, synthetic, reverse).stream().sorted().toList(),
+                included.violations().getFirst().evidence());
+    }
+
+    @Test
+    void syntheticOriginsAreIgnoredEvenWithoutEvidenceOwners() {
+        for (var origin : List.of(GENERATED, A_BRIDGE)) {
+            DependencyGraph graph = DependencyGraph.builder()
+                    .addNode(origin).addNode(B)
+                    .addDependency(origin, B, DependencyKind.METHOD_CALL, evidence(null, 10))
+                    .addDependency(B, origin, DependencyKind.METHOD_CALL, evidence(null, 20))
+                    .build();
+
+            assertEquals(RuleStatus.PASSED,
+                    CycleRules.typesAreAcyclic(model, graph, packages("app")).check().status());
+            assertEquals(RuleStatus.FAILED,
+                    CycleRules.typesAreAcyclic(model, graph, packages("app"),
+                            CycleRuleOptions.defaults().withSyntheticEdges(SyntheticEdgePolicy.INCLUDE))
+                            .check().status());
+        }
+    }
+
+    @Test
     void packageProjectionIgnoresIntraPackageEdgesAndRetainsUnderlyingEvidence() {
-        DependencyEvidence outward = evidence(null, 50);
-        DependencyEvidence inward = evidence(null, 60);
+        DependencyEvidence outward = evidence(A_WORK, 50);
+        DependencyEvidence inward = evidence(D_WORK, 60);
         DependencyGraph graph = DependencyGraph.builder()
                 .addNode(A).addNode(B).addNode(D)
                 .addDependency(A, B, DependencyKind.METHOD_CALL, evidence(null, 40))
@@ -181,6 +265,10 @@ class CycleRulesTest {
                 builder.withMethodBody(
                         "bridge", MethodTypeDesc.of(ClassDesc.ofDescriptor("V")),
                         ClassFile.ACC_PUBLIC | ClassFile.ACC_SYNTHETIC | ClassFile.ACC_BRIDGE,
+                        code -> code.return_());
+                builder.withMethodBody(
+                        "generated", MethodTypeDesc.of(ClassDesc.ofDescriptor("V")),
+                        ClassFile.ACC_PRIVATE | ClassFile.ACC_SYNTHETIC,
                         code -> code.return_());
             }
         });
