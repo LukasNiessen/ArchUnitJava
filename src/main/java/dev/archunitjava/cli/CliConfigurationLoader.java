@@ -33,7 +33,7 @@ public final class CliConfigurationLoader {
             "schema", "inputs", "rules", "emptySelection", "allowIncompleteAnalysis",
             "resultFormat", "graphFormat", "graphDomain");
     private static final Set<String> RULE_FIELDS = Set.of(
-            "domain", "mode", "origins", "targets", "self", "external",
+            "kind", "domain", "mode", "origins", "targets", "self", "external",
             "displayName", "rationale", "tags", "severity");
 
     private CliConfigurationLoader() {}
@@ -81,13 +81,24 @@ public final class CliConfigurationLoader {
         }
         String prefix = "rule." + id + '.';
         CliGraphDomain domain = CliGraphDomain.parse(required(values, prefix + "domain"));
-        DependencyRuleMode mode = enumValue(
+        CliRuleKind kind = enumValue(CliRuleKind.class,
+                values.getOrDefault(prefix + "kind", "dependency"), "rule kind");
+        CliPattern origins = CliPattern.parse(required(values, prefix + "origins"));
+        if (kind == CliRuleKind.CYCLES) {
+            for (String field : List.of("mode", "targets", "self", "external")) {
+                if (values.containsKey(prefix + field)) {
+                    throw new CliConfigurationException("Cycle rule " + id + " does not accept " + field);
+                }
+            }
+        }
+        DependencyRuleMode mode = kind == CliRuleKind.CYCLES ? DependencyRuleMode.NO : enumValue(
                 DependencyRuleMode.class, required(values, prefix + "mode"), "rule mode");
         SelfDependencyPolicy self = enumValue(
                 SelfDependencyPolicy.class, values.getOrDefault(prefix + "self", "ignore"),
                 "self-dependency policy");
         ExternalDependencyPolicy external = switch (values.getOrDefault(
-                prefix + "external", "fail").toLowerCase(java.util.Locale.ROOT)) {
+                prefix + "external", kind == CliRuleKind.CYCLES ? "ignore" : "fail")
+                .toLowerCase(java.util.Locale.ROOT)) {
             case "ignore" -> ExternalDependencyPolicy.IGNORE;
             case "fail" -> ExternalDependencyPolicy.FAIL;
             case "non-matching", "treat-as-non-matching" ->
@@ -101,15 +112,16 @@ public final class CliConfigurationLoader {
                 id,
                 domain,
                 mode,
-                CliPattern.parse(required(values, prefix + "origins")),
-                CliPattern.parse(required(values, prefix + "targets")),
+                origins,
+                kind == CliRuleKind.CYCLES ? origins : CliPattern.parse(required(values, prefix + "targets")),
                 self,
                 external,
                 Optional.ofNullable(values.get(prefix + "displayName")),
                 Optional.ofNullable(values.get(prefix + "rationale")),
                 tags,
                 enumValue(Severity.class, values.getOrDefault(prefix + "severity", "error"),
-                        "severity"));
+                        "severity"),
+                kind);
     }
 
     private static Map<String, String> parse(byte[] bytes) {

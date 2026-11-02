@@ -91,6 +91,9 @@ jobs:
       - name: Build release candidate
         shell: bash
         run: ./mvnw --batch-mode --no-transfer-progress -Prelease-candidate -DskipTests verify
+      - name: Check reviewed public API signatures
+        shell: pwsh
+        run: ./scripts/check-public-api.ps1
       - name: Reject unexpected SpotBugs findings
         shell: bash
         run: |

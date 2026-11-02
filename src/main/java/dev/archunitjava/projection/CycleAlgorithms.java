@@ -9,6 +9,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Objects;
@@ -16,7 +17,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-/** Deterministic, graph-generic SCC and bounded elementary-cycle algorithms. */
+/** Deterministic, iterative SCC and bounded elementary-cycle algorithms. */
 public final class CycleAlgorithms {
     private CycleAlgorithms() {}
 
@@ -90,20 +91,40 @@ public final class CycleAlgorithms {
         }
 
         private void visit(StableId node) {
+            Deque<TraversalFrame> frames = new ArrayDeque<>();
+            discover(node, frames);
+            while (!frames.isEmpty()) {
+                TraversalFrame frame = frames.peek();
+                if (frame.targets.hasNext()) {
+                    StableId target = frame.targets.next();
+                    if (!indexes.containsKey(target)) {
+                        discover(target, frames);
+                    } else if (onStack.contains(target)) {
+                        lowLinks.put(frame.node, Math.min(lowLinks.get(frame.node), indexes.get(target)));
+                    }
+                    continue;
+                }
+                frames.pop();
+                if (!frames.isEmpty()) {
+                    StableId parent = frames.peek().node;
+                    lowLinks.put(parent, Math.min(lowLinks.get(parent), lowLinks.get(frame.node)));
+                }
+                if (lowLinks.get(frame.node).equals(indexes.get(frame.node))) {
+                    completeComponent(frame.node);
+                }
+            }
+        }
+
+        private void discover(StableId node, Deque<TraversalFrame> frames) {
             int index = nextIndex++;
             indexes.put(node, index);
             lowLinks.put(node, index);
             stack.push(node);
             onStack.add(node);
-            for (StableId target : adjacency.targets.get(node)) {
-                if (!indexes.containsKey(target)) {
-                    visit(target);
-                    lowLinks.put(node, Math.min(lowLinks.get(node), lowLinks.get(target)));
-                } else if (onStack.contains(target)) {
-                    lowLinks.put(node, Math.min(lowLinks.get(node), indexes.get(target)));
-                }
-            }
-            if (!lowLinks.get(node).equals(indexes.get(node))) return;
+            frames.push(new TraversalFrame(node, adjacency.targets.get(node).iterator()));
+        }
+
+        private void completeComponent(StableId node) {
             ArrayList<StableId> nodes = new ArrayList<>();
             StableId current;
             do {
@@ -148,8 +169,18 @@ public final class CycleAlgorithms {
                 Set<StableId> component,
                 ArrayList<StableId> path,
                 Set<StableId> visited) {
-            for (StableId target : adjacency.targets.get(current)) {
-                if (stopped || !component.contains(target) || target.compareTo(start) < 0) continue;
+            Deque<TraversalFrame> frames = new ArrayDeque<>();
+            frames.push(new TraversalFrame(current, adjacency.targets.get(current).iterator()));
+            while (!frames.isEmpty() && !stopped) {
+                TraversalFrame frame = frames.peek();
+                if (!frame.targets.hasNext()) {
+                    frames.pop();
+                    visited.remove(frame.node);
+                    path.removeLast();
+                    continue;
+                }
+                StableId target = frame.targets.next();
+                if (!component.contains(target) || target.compareTo(start) < 0) continue;
                 if (traversedEdges == options.maximumTraversedEdges()) {
                     truncated = true;
                     stopped = true;
@@ -165,9 +196,7 @@ public final class CycleAlgorithms {
                     }
                     visited.add(target);
                     path.add(target);
-                    search(start, target, component, path, visited);
-                    path.removeLast();
-                    visited.remove(target);
+                    frames.push(new TraversalFrame(target, adjacency.targets.get(target).iterator()));
                 }
             }
         }
@@ -183,4 +212,6 @@ public final class CycleAlgorithms {
             cycles.add(cycle);
         }
     }
+
+    private record TraversalFrame(StableId node, Iterator<StableId> targets) {}
 }

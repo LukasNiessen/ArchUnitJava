@@ -9,7 +9,7 @@ long-term support commitment or stable release line exists before 1.0.
 ## Reporting a vulnerability
 
 Please use GitHub's private
-[security-advisory form](https://github.com/LukasNiessen/ArchUnitJava/security/advisories/new).
+[security-advisory form](https://github.com/dragonsec-ai/ArchUnitJava/security/advisories/new).
 Do not include exploit details, malicious bytecode, credentials, or private repository content in a
 public issue.
 

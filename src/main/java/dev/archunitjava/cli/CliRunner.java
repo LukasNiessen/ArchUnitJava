@@ -77,6 +77,13 @@ public final class CliRunner {
                 .append("\ninputs=").append(configuration.inputs().size())
                 .append("\nrules=").append(configuration.rules().size()).append('\n');
         for (CliRuleConfiguration rule : configuration.rules()) {
+            if (rule.kind() == CliRuleKind.CYCLES) {
+                text.append("rule ").append(rule.id()).append(": domain=")
+                        .append(rule.domain()).append(" kind=CYCLES origins=")
+                        .append(singleLine(rule.origins().toString()))
+                        .append(" synthetic=IGNORE typeUses=INCLUDE\n");
+                continue;
+            }
             text.append("rule ").append(rule.id()).append(": domain=")
                     .append(rule.domain()).append(" mode=").append(rule.mode())
                     .append(" origins=").append(singleLine(rule.origins().toString()))

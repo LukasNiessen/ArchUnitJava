@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import dev.archunitjava.cli.CliAnalysisResult;
 import dev.archunitjava.cli.CliAnalyzer;
 import dev.archunitjava.cli.CliConfigurationLoader;
+import dev.archunitjava.cli.CliRunner;
 import dev.archunitjava.graph.DependencyEvidence;
 import dev.archunitjava.graph.DependencyKind;
 import dev.archunitjava.graph.MemberId;
@@ -170,4 +171,76 @@ class CycleRulesBytecodeTest {
                 TypeSelector.binaryName(JavaPattern.exact(PatternDomain.QUALIFIED_NAME, first)),
                 TypeSelector.binaryName(JavaPattern.exact(PatternDomain.QUALIFIED_NAME, second)));
     }
+
+    @Test
+    void declarativeCyclesReachTheSameRulesAndAllResultRenderers() throws IOException {
+        for (String domain : List.of("types", "packages")) {
+            Path configuration = cycleConfiguration(domain, "glob:" + PREFIX + "**", "");
+            for (String format : List.of("console", "json", "sarif", "junit-xml")) {
+                var output = new StringBuilder();
+                var errors = new StringBuilder();
+                assertEquals(5, new CliRunner().run(new String[] {"check", "--config",
+                        configuration.toString(), "--root", temporaryDirectory.toString(),
+                        "--result-format", format}, output, errors), domain + "/" + format);
+                assertTrue(output.toString().contains("cycle.detected"));
+                assertTrue(errors.isEmpty());
+            }
+        }
+    }
+
+    @Test
+    void declarativeCycleSelectionsAreInducedAndEmptySelectionsFail() throws IOException {
+        assertEquals(0, runCycle("types", "exact:" + LEFT.binaryName(), "check", "").exit());
+        assertEquals(0, runCycle("packages", "exact:" + PREFIX + "left", "check", "").exit());
+        assertEquals(4, runCycle("types", "exact:missing.Type", "check", "").exit());
+        var explanation = runCycle("types", "glob:" + PREFIX + "**", "explain", "");
+        assertEquals(0, explanation.exit());
+        assertTrue(explanation.output().contains("kind=CYCLES"));
+        assertTrue(explanation.output().contains("synthetic=IGNORE typeUses=INCLUDE"));
+        assertFalse(explanation.output().contains("targets="));
+    }
+
+    @Test
+    void declarativeCyclesRejectIrrelevantFieldsAndRetainImportFailures() throws IOException {
+        for (String extra : List.of("mode=no", "targets=glob:**", "self=ignore", "external=ignore",
+                "kind=unknown", "synthetic=include")) {
+            assertEquals(3, runCycle("types", "glob:" + PREFIX + "**", "validate-config",
+                    "rule.fixture." + extra + "\n").exit(), extra);
+        }
+        Files.write(temporaryDirectory.resolve("classes/Broken.class"), new byte[] {0, 1, 2});
+        var result = runCycle("types", "glob:" + PREFIX + "**", "check", "");
+        assertEquals(4, result.exit());
+        assertTrue(result.output().contains("INCOMPLETE"));
+        assertTrue(result.output().contains("cycle.detected"));
+    }
+
+    private Path cycleConfiguration(String domain, String selection, String extra) throws IOException {
+        Path configuration = Files.createTempFile(temporaryDirectory, "cycles", ".properties");
+        Files.writeString(configuration, """
+                schema=archunitjava.cli.v1
+                inputs=classes
+                rules=fixture
+                resultFormat=json
+                rule.fixture.kind=cycles
+                rule.fixture.domain=%s
+                rule.fixture.origins=%s
+                rule.fixture.displayName=Cycle policy
+                rule.fixture.rationale=Keep the selected graph acyclic
+                rule.fixture.tags=cycles
+                """.formatted(domain, selection) + extra);
+        return configuration;
+    }
+
+    private Invocation runCycle(String domain, String selection, String command, String extra)
+            throws IOException {
+        Path configuration = cycleConfiguration(domain, selection, extra);
+        var output = new StringBuilder();
+        var errors = new StringBuilder();
+        int exit = new CliRunner().run(new String[] {command, "--config", configuration.toString(),
+                "--root", temporaryDirectory.toString()}, output, errors);
+        return new Invocation(exit, output.toString(), errors.toString());
+    }
+
+    private record Invocation(int exit, String output, String errors) {}
+
 }

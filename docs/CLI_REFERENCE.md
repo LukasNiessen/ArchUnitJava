@@ -54,10 +54,11 @@ For each ID in `rules`, use the prefix `rule.<id>.`.
 
 | Field | Required | Values and behavior |
 | --- | --- | --- |
+| `kind` | no | `dependency` (default) or `cycles` |
 | `domain` | yes | `types` or `packages` |
-| `mode` | yes | `no`, `only`, `any`, or `required` |
+| `mode` | dependency only | `no`, `only`, `any`, or `required` |
 | `origins` | yes | One `exact:` or `glob:` qualified-name pattern |
-| `targets` | yes | One `exact:` or `glob:` qualified-name pattern |
+| `targets` | dependency only | One `exact:` or `glob:` qualified-name pattern |
 | `self` | no | `include` or `ignore` (default `ignore`) |
 | `external` | no | `ignore`, `fail`, `non-matching`, or `treat-as-non-matching` (default `fail`) |
 | `displayName` | no | Human-readable name, 1–4,096 characters |
@@ -75,6 +76,28 @@ Rule modes mean:
 `external=fail` is the conservative default. Use `ignore` only when dependencies outside the
 imported model are intentionally irrelevant. `non-matching` retains external edges and lets the
 rule mode decide whether they violate the policy.
+
+### Cycle rules
+
+Use `kind=cycles` with `domain=types` or `packages` and a single `origins` selection:
+
+```properties
+schema=archunitjava.cli.v1
+inputs=target/classes
+rules=cycles
+rule.cycles.kind=cycles
+rule.cycles.domain=packages
+rule.cycles.origins=glob:com.example.**
+```
+
+The induced graph contains only selected imported subjects; paths through unselected types or
+packages are outside the check. Empty selections fail by default. Cycle rules include type-use
+dependencies and ignore synthetic evidence by default, using `CycleRuleOptions.defaults()`.
+Ordinary member-owned dependencies are retained, including edges with mixed synthetic evidence.
+`mode`, `targets`, `self`, and `external` are rejected for cycle rules. Use the Java API to customize
+cycle policies. Metadata (`displayName`, `rationale`, `tags`, `severity`), result formats, and
+incomplete-import handling work for both rule kinds. Older beta readers reject the new `kind` key;
+omit it for dependency configurations shared with those versions.
 
 ## Patterns
 
@@ -137,4 +160,4 @@ ordinary architecture violation.
 
 Continue with the [user guide](USER_GUIDE.md), the
 [working example](../examples/basic), or the
-[CLI API reference](https://lukasniessen.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/cli/package-summary.html).
+[CLI API reference](https://dragonsec-ai.github.io/ArchUnitJava/api/dev.archunitjava/dev/archunitjava/cli/package-summary.html).

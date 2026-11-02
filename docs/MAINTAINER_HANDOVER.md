@@ -1,8 +1,9 @@
 # Maintainer handover
 
-Status as of 2026-09-17: the GitHub repository transfer is complete.
-[Lukas Niessen](https://github.com/LukasNiessen) owns
-[`LukasNiessen/ArchUnitJava`](https://github.com/LukasNiessen/ArchUnitJava).
+Status as of 2026-11-02: the repository now belongs to the `dragonsec-ai` organization at
+[`dragonsec-ai/ArchUnitJava`](https://github.com/dragonsec-ai/ArchUnitJava).
+[Lukas Niessen](https://github.com/LukasNiessen) is a maintainer following the earlier personal
+account transfer on 2026-09-17.
 Tristan Kruse remains a collaborator. The independent
 [`TristanKruse/ArchUnitJava-TestRepo-RAG`](https://github.com/TristanKruse/ArchUnitJava-TestRepo-RAG)
 was deliberately not transferred; library CI continues to check it out from Tristan's account.
@@ -13,9 +14,9 @@ was deliberately not transferred; library CI continues to check it out from Tris
   point to Lukas's repository. Historical publishing facts and the RAG fixture's separate owner
   remain unchanged.
 - The repository homepage and GitHub Pages site use
-  <https://lukasniessen.github.io/ArchUnitJava/>. GitHub does not redirect the former Pages URL;
+  <https://dragonsec-ai.github.io/ArchUnitJava/>. GitHub does not redirect the former Pages URL;
   it currently returns 404. Git repository and Git activity URLs redirect, but other local clones
-  should update their remotes to `https://github.com/LukasNiessen/ArchUnitJava.git`.
+  should update their remotes to `https://github.com/dragonsec-ai/ArchUnitJava.git`.
 - Release-tag automation uses the workflow initiator as tagger rather than hard-coding Tristan.
   Existing signed tags and their attribution have not been modified. A future tag's GitHub
   verification also depends on the signing key's identity matching the new tagger address.
