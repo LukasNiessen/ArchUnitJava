@@ -62,6 +62,8 @@ def main():
     credentials = os.environ["MAVEN_CENTRAL_USERNAME"] + ":" + os.environ["MAVEN_CENTRAL_PASSWORD"]
     token = base64.b64encode(credentials.encode("utf-8")).decode("ascii")
     status = json.loads(request("/status?" + urllib.parse.urlencode({"id": args.deployment_id}), token))
+    # Public component identities and deployment state are useful diagnostics; never log headers.
+    print(json.dumps({key: status.get(key) for key in ("deploymentId", "deploymentState", "purls")})[:4096])
     state = validate_status(status, args.deployment_id, args.version)
     print(json.dumps({"deploymentId": args.deployment_id, "version": args.version, "state": state}))
     if args.mode == "publish" and state == "VALIDATED":
