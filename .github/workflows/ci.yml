@@ -88,7 +88,11 @@ jobs:
             test -s "$file"
           done
           grep -F 'Decision: PUBLISHED PUBLIC BETA.' docs/RELEASE.md
-      - name: Build release candidate
+      - name: Verify publication guard
+        # The publisher uses only Python's standard library and is not part of the Java runtime.
+        shell: bash
+        run: python3 -B -m unittest discover -s scripts/tests -v
+      - name: Build release artifacts
         shell: bash
         run: ./mvnw --batch-mode --no-transfer-progress -Prelease-candidate -DskipTests verify
       - name: Check reviewed public API signatures

@@ -73,7 +73,10 @@ jobs:
       - name: Verify the exact release candidate
         shell: bash
         run: ./mvnw --batch-mode --no-transfer-progress -Prelease-candidate verify
-      - name: Upload a signed user-managed Central deployment
+      - name: Check reviewed release API signatures
+        shell: pwsh
+        run: ./scripts/check-public-api.ps1
+      - name: Upload the verified Central bundle
         shell: bash
         env:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
