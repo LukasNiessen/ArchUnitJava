@@ -45,6 +45,19 @@ class PublicationGuardTest(unittest.TestCase):
             with self.subTest(deployment=deployment), self.assertRaises(ValueError):
                 central.validate_status(self.status(), deployment, "1.0.0")
 
+    def test_published_empty_purls_require_an_exact_committed_review_record(self):
+        status = {**self.status(), "deploymentState": "PUBLISHED", "purls": []}
+        review = {"schema": "archunitjava.release.v1", "deploymentId": DEPLOYMENT,
+                  "coordinate": self.status()["purls"][0], "bundleSha256": "a" * 64}
+        self.assertEqual("PUBLISHED", central.validate_status(status, DEPLOYMENT, "1.0.0", review))
+        for bad in (None, {}, {**review, "deploymentId": "wrong"},
+                    {**review, "coordinate": "pkg:maven/other/package@1.0.0"},
+                    {**review, "bundleSha256": "invalid"}):
+            with self.subTest(review=bad), self.assertRaises(ValueError):
+                central.validate_status(status, DEPLOYMENT, "1.0.0", bad)
+        with self.assertRaises(ValueError):
+            central.validate_status({**status, "deploymentState": "VALIDATED"}, DEPLOYMENT, "1.0.0", review)
+
     def run_main(self, mode, status):
         with patch("sys.argv", ["publish-central.py", "--deployment-id", DEPLOYMENT,
                                 "--version", "1.0.0", "--mode", mode]), \

@@ -2,7 +2,7 @@
 
 ## Runtime and build JDK
 
-The published `0.1.0` release requires JDK 25. The implementation uses the final
+The published `1.0.0` release requires JDK 25. The implementation uses the final
 `java.lang.classfile` API and the Maven build enforces `[25,26)`. Java 17 or 21 runtime support would
 require a different bytecode backend or a multi-release implementation and is not claimed.
 
@@ -26,21 +26,20 @@ replacement for JVM resolution. Runtime layers, command-line `--add-reads`/`--ad
 and reflective access can differ from the analyzed descriptors.
 
 The library artifact contains no `module-info.class`. Its manifest declares
-`Automatic-Module-Name: dev.archunitjava`, giving JPMS consumers a stable provisional module name.
+`Automatic-Module-Name: dev.archunitjava`, giving JPMS consumers a stable module name.
 JUnit Platform integration is an optional dependency and a service-provider entry is packaged.
 
 ## API and ecosystem compatibility
 
-Before 1.0, public API compatibility is provisional and breaking changes may occur between minor
-development candidates. Release notes must identify them. ArchUnitJava does not claim compatibility
+The pre-1.0 API was provisional. Version 1 follows the contract below; release notes identify
+compatibility changes. ArchUnitJava does not claim compatibility
 with the original ArchUnit API or its rule semantics. Configuration and report formats carry their
 own schema versions and reject unknown schemas where ingestion exists.
 
-## Version 1 contract (candidate)
+## Version 1 contract
 
-The development version is `1.0.0-SNAPSHOT`; the public registry still contains the `0.1.0` beta.
-These promises become effective with publication of `1.0.0`, after the
-[candidate gates](V1_READINESS.md) pass:
+Version `1.0.0` was published on 2026-11-10 after the [release gates](V1_READINESS.md) passed.
+The development line is `1.0.1-SNAPSHOT`. The following contract applies to the published v1 line:
 
 - Public/protected declarations in the primary artifact form the supported Java API. Package-private
   implementation and generated files are excluded. Public records' constructors/components are
@@ -70,7 +69,7 @@ binary compatibility property: tests and release review still cover semantics an
 
 ## Decision
 
-The `0.1.x` line retains JDK 25 instead of adding a third-party parser solely to lower the
+The `1.x` line retains JDK 25 instead of adding a third-party parser solely to lower the
 runtime floor. That keeps the dependency surface small and the extraction behavior anchored to the
 JDK API. The decision should be reconsidered only with usage data and a separately tested backend;
-it is not a promise that a future 1.0 will require JDK 25.
+lowering the runtime floor requires a separately tested backend.

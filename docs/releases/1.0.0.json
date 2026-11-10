@@ -1,0 +1,23 @@
+{
+  "schema": "archunitjava.release.v1",
+  "version": "1.0.0",
+  "coordinate": "pkg:maven/io.github.tristankruse/archunitjava@1.0.0",
+  "date": "2026-11-10",
+  "tag": "v1.0.0",
+  "commit": "970d5f79005153b229ab526203482138446a4756",
+  "deploymentId": "0aa00785-a3b2-4560-b3f7-74463a3fc56f",
+  "bundleSha256": "d95718cdad0451ccf62ddf249755b6e0f6c2dd33b195b1b29e4afac521151617",
+  "signer": "8F7C42989C49216FA75523251BB3BFA38C776312",
+  "verifiedChecksums": 16,
+  "verifiedSignatures": 4,
+  "files": {
+    "archunitjava-1.0.0.jar": "b430961c8b51fa09481cd15f4efe2f6a537535d5f04cfcbcd950f96e694a820f",
+    "archunitjava-1.0.0-sources.jar": "3b1b4700f71c965d2452c2c6d3b26da66526de075c003a0b602ef3cdf967baf5",
+    "archunitjava-1.0.0-javadoc.jar": "f205394ffc35698699a32d704b3ad01ec345e1567cf6296a77c225a02331de1d",
+    "archunitjava-1.0.0.pom": "4d1fc8255fe40658cbf717afaddf79abb2d16ff566d6d1119600f0c3a81529f3"
+  },
+  "tagRun": 42804890008,
+  "stageRun": 42806337865,
+  "publicationRun": 42809671438,
+  "publicInstallation": "Independent RAG consumer: five tests passed with an empty Maven cache"
+}

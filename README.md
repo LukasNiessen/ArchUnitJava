@@ -11,8 +11,8 @@
 [![Documentation](https://github.com/dragonsec-ai/ArchUnitJava/actions/workflows/docs.yml/badge.svg)](https://dragonsec-ai.github.io/ArchUnitJava/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Java 25](https://img.shields.io/badge/Java-25-E76F00?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/25/)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.tristankruse/archunitjava.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.tristankruse/archunitjava/0.1.0)
-[![Status: public beta](https://img.shields.io/badge/status-public%20beta-f89820)](docs/RELEASE.md)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.tristankruse/archunitjava.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.tristankruse/archunitjava/1.0.0)
+[![Status: stable v1](https://img.shields.io/badge/status-stable%20v1-2ea44f)](docs/RELEASE.md)
 [![GitHub stars](https://img.shields.io/github/stars/dragonsec-ai/ArchUnitJava.svg)](https://github.com/dragonsec-ai/ArchUnitJava)
 
 </div>
@@ -21,16 +21,15 @@ Enforce architecture boundaries against compiled Java code. ArchUnitJava reads c
 and JARs without loading target classes, builds an immutable dependency model, evaluates
 deterministic policies, and produces evidence for JUnit and CI.
 
-> **Public beta:** `io.github.tristankruse:archunitjava:0.1.0` is published on
-> [Maven Central](https://central.sonatype.com/artifact/io.github.tristankruse/archunitjava/0.1.0).
-> Its signed tag, Central validation, checksums, signatures, and publication record are documented
-> in the [release assessment](docs/RELEASE.md). The pre-1.0 API remains provisional and may change
-> between minor versions.
+> **Stable v1:** `io.github.tristankruse:archunitjava:1.0.0` is published on
+> [Maven Central](https://central.sonatype.com/artifact/io.github.tristankruse/archunitjava/1.0.0).
+> Its signed tag, checksums, signatures, and clean-consumer verification are documented in the
+> [release record](docs/RELEASE.md). The [v1 compatibility contract](docs/COMPATIBILITY.md) defines
+> the supported Java API, schemas, and JDK 25 runtime baseline.
 
-The current source prepares **1.0.0**. See the [release checklist](docs/V1_READINESS.md) and
-[family feature comparison](docs/V1_FEATURE_COMPARISON.md). The cycle-evidence correction and
-properties cycle rules described there require the development candidate; they are absent from
-the published `0.1.0` beta.
+Version 1.0 corrects cycle evidence filtering, handles deep graphs without recursive traversal,
+and supports declarative cycle rules. See the [completed checklist](docs/V1_READINESS.md) and
+[family feature comparison](docs/V1_FEATURE_COMPARISON.md).
 
 _Inspired by the established [ArchUnit](https://www.archunit.org/) project, but independently
 implemented and not affiliated with ArchUnit. This is not a drop-in replacement._
@@ -59,7 +58,7 @@ Maven uses Central by default; Gradle consumers only need `mavenCentral()`.
 <dependency>
   <groupId>io.github.tristankruse</groupId>
   <artifactId>archunitjava</artifactId>
-  <version>0.1.0</version>
+  <version>1.0.0</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -74,7 +73,7 @@ repositories {
 }
 
 dependencies {
-    testImplementation("io.github.tristankruse:archunitjava:0.1.0")
+    testImplementation("io.github.tristankruse:archunitjava:1.0.0")
 }
 ```
 
@@ -232,9 +231,8 @@ are described in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## 🔎 Logging and inspection
 
-> These logging and pretty-report APIs require the **unreleased 1.0 candidate**, or a build of
-> the current `main` branch from source. The published **0.1.0** artifact used in
-> the quickstart does not include them.
+> These logging and pretty-report APIs are included in **1.0.0**. They are absent from the older
+> **0.1.0** beta.
 
 Logging is **off by default** and scoped to an individual check or analysis. Choose
 `ERROR`, `WARN`, `INFO`, or `DEBUG`; higher verbosity includes all lower levels.
@@ -474,19 +472,19 @@ public issue. The supported scope and reporting guidance are in [SECURITY.md](SE
 The original [ArchUnit](https://www.archunit.org/) is mature, widely used, and is generally the
 correct choice for production Java architecture testing today.
 
-ArchUnitJava is a public beta that exists to explore a consistent ArchUnitEverything product family, a
+ArchUnitJava is an independent member of the ArchUnitEverything product family, with a
 bytecode-as-untrusted-data security boundary, explicit completeness, deterministic evidence, and
 cross-language architecture-policy concepts. Evaluate this release when those goals are relevant
-and you are comfortable with a provisional pre-1.0 API. Do not migrate a production system on the
+and the documented v1 compatibility scope fits your project. Do not migrate a production system on the
 assumption of ArchUnit compatibility.
 
 ## 📅 Current limitations
 
-- Version `0.1.0` is a public beta; the API remains provisional before 1.0.
+- Version 1 supports the API and runtime scope documented in the compatibility contract.
 - The CLI intentionally exposes only a subset of the lower-level Java rule surface.
 - JDK 25 is currently required at runtime because the importer uses `java.lang.classfile`.
 - Dynamic runtime dependencies are invisible to static bytecode analysis.
-- API contracts remain provisional before 1.0 and are not compatible with ArchUnit's API.
+- The API is independently designed and is not compatible with ArchUnit's API.
 - Performance data is regression evidence, not an absolute scalability claim.
 
 These limitations are tracked in the [release assessment](docs/RELEASE.md) rather than hidden behind
@@ -515,7 +513,7 @@ is used only by maintainers to stage and publish releases.
 
 **Will an application need JDK 25 even if its own bytecode targets an older Java version?**
 
-For version `0.1.0`, yes: ArchUnitJava itself runs on JDK 25 because it uses the JDK
+For version `1.0.0`, yes: ArchUnitJava itself runs on JDK 25 because it uses the JDK
 class-file API. It can analyze `javac` bytecode produced for Java 8 through Java 25.
 
 **Does analysis execute application classes or the target project's build?**

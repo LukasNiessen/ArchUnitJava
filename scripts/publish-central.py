@@ -4,6 +4,7 @@ import argparse
 import base64
 import json
 import os
+from pathlib import Path
 import re
 import urllib.error
 import urllib.parse
@@ -20,14 +21,23 @@ def validate_inputs(deployment_id, version):
         raise ValueError("Expected a final semantic release version")
 
 
-def validate_status(status, deployment_id, version):
+def validate_status(status, deployment_id, version, review=None):
     """Accept only the exact component in a validated or already publishing state."""
     validate_inputs(deployment_id, version)
     if not isinstance(status, dict) or status.get("deploymentId") != deployment_id:
         raise ValueError("Central returned a different deployment ID")
     expected = f"pkg:maven/io.github.tristankruse/archunitjava@{version}"
     if status.get("purls") != [expected]:
-        raise ValueError("Deployment must contain exactly the expected Maven coordinate")
+        # Central drops purls after publication. Only a committed bundle-review record can
+        # establish the original identity then; validated/unpublished deployments stay strict.
+        recorded_publication = (
+            status.get("deploymentState") == "PUBLISHED" and status.get("purls") == []
+            and isinstance(review, dict) and review.get("schema") == "archunitjava.release.v1"
+            and review.get("deploymentId") == deployment_id and review.get("coordinate") == expected
+            and re.fullmatch(r"[0-9a-f]{64}", review.get("bundleSha256", "")) is not None
+        )
+        if not recorded_publication:
+            raise ValueError("Deployment must contain exactly the expected Maven coordinate or a reviewed publication record")
     if status.get("deploymentState") not in {"VALIDATED", "PUBLISHING", "PUBLISHED"}:
         raise ValueError("Deployment has not passed validation")
     return status["deploymentState"]
@@ -64,7 +74,9 @@ def main():
     status = json.loads(request("/status?" + urllib.parse.urlencode({"id": args.deployment_id}), token))
     # Public component identities and deployment state are useful diagnostics; never log headers.
     print(json.dumps({key: status.get(key) for key in ("deploymentId", "deploymentState", "purls")})[:4096])
-    state = validate_status(status, args.deployment_id, args.version)
+    review_path = Path(__file__).resolve().parents[1] / "docs" / "releases" / (args.version + ".json")
+    review = json.loads(review_path.read_text(encoding="utf-8")) if review_path.is_file() else None
+    state = validate_status(status, args.deployment_id, args.version, review)
     print(json.dumps({"deploymentId": args.deployment_id, "version": args.version, "state": state}))
     if args.mode == "publish" and state == "VALIDATED":
         request("/deployment/" + args.deployment_id, token)

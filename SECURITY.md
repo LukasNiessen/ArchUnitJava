@@ -2,9 +2,9 @@
 
 ## Supported versions
 
-Version `0.1.0` is a published public beta. Security fixes currently target `main` and will be
-included in a new release, not retroactively applied to the immutable `0.1.0` artifact. No
-long-term support commitment or stable release line exists before 1.0.
+Security fixes target the latest `1.x` release and `main`, and ship in a new immutable artifact.
+Version `1.0.0` is the current stable release. The older `0.1.0` beta is not a maintained release
+line; upgrade to v1. No separate long-term-support commitment is made.
 
 ## Reporting a vulnerability
 

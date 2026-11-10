@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="ArchUnitJava public beta — static architecture analysis and executable architecture policies for compiled Java code.">
+  <meta name="description" content="ArchUnitJava — static architecture analysis and executable architecture policies for compiled Java code.">
   <meta property="og:title" content="ArchUnitJava — Architecture testing for compiled Java">
-  <meta property="og:description" content="A public-beta architecture-testing library with deterministic rules, JUnit integration, and evidence-rich reports.">
+  <meta property="og:description" content="An architecture-testing library with deterministic rules, JUnit integration, evidence-rich reports, and a v1 compatibility contract.">
   <meta property="og:image" content="https://dragonsec-ai.github.io/ArchUnitJava/social-preview.png">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
@@ -39,17 +39,17 @@
         <p class="lede">Import compiled classes without loading them, model their real dependency
           graph, evaluate deterministic rules, and publish reviewable results in tests and CI.</p>
         <div class="actions">
-          <a class="button primary" href="#quickstart">Use public beta 0.1.0</a>
+          <a class="button primary" href="#quickstart">Use ArchUnitJava 1.0.0</a>
           <a class="button" href="api/">Browse Javadocs</a>
-          <a class="button" href="https://central.sonatype.com/artifact/io.github.tristankruse/archunitjava/0.1.0">Maven Central</a>
+          <a class="button" href="https://central.sonatype.com/artifact/io.github.tristankruse/archunitjava/1.0.0">Maven Central</a>
           <a class="button" href="https://github.com/TristanKruse/ArchUnitJava-TestRepo-RAG">Open test repository</a>
         </div>
       </div>
       <aside class="status-card" aria-label="Release status">
         <img class="status-logo" src="logo-rounded.png" alt="ArchUnitJava AU family logo">
-        <div class="status-line"><span class="dot"></span> Public beta on Maven Central</div>
+        <div class="status-line"><span class="dot"></span> Stable v1 on Maven Central</div>
         <dl>
-          <dt>Version</dt><dd>0.1.0</dd>
+          <dt>Version</dt><dd>1.0.0</dd>
           <dt>Runtime</dt><dd>JDK 25</dd>
           <dt>Target bytecode</dt><dd>Java 8–25</dd>
           <dt>Release status</dt><dd>PUBLIC BETA</dd>
@@ -76,7 +76,7 @@
         <p>Add the published release as a test dependency and point a bounded policy file at
           compiled classes.</p>
         <p><strong>Maven Central</strong> is the public registry; <strong>Central Portal</strong> is
-          its publisher interface. Maven and Gradle consumers resolve version 0.1.0 from Central
+          its publisher interface. Maven and Gradle consumers resolve version 1.0.0 from Central
           without needing a Portal account.</p>
       </div>
       <div class="grid-2">
@@ -87,7 +87,7 @@
 }
 
 dependencies {
-    testImplementation(<span class="property">"io.github.tristankruse:archunitjava:0.1.0"</span>)
+    testImplementation(<span class="property">"io.github.tristankruse:archunitjava:1.0.0"</span>)
 }</code></pre>
         </div>
         <div class="code-card">
@@ -95,7 +95,7 @@ dependencies {
           <pre><code>&lt;dependency&gt;
   &lt;groupId&gt;<span class="property">io.github.tristankruse</span>&lt;/groupId&gt;
   &lt;artifactId&gt;<span class="property">archunitjava</span>&lt;/artifactId&gt;
-  &lt;version&gt;<span class="property">0.1.0</span>&lt;/version&gt;
+  &lt;version&gt;<span class="property">1.0.0</span>&lt;/version&gt;
   &lt;scope&gt;test&lt;/scope&gt;
 &lt;/dependency&gt;</code></pre>
         </div>
@@ -210,7 +210,7 @@ dependencies {
           </ul>
         </div>
         <aside class="callout">
-          <strong>Honest status: version 0.1.0 is a published public beta; the pre-1.0 API is provisional.</strong>
+          <strong>Version 1.0.0 is published with a documented API and JDK 25 compatibility contract.</strong>
           <p>Baseline ingestion, <code>package-info.class</code>, regex safety, CSV hardening, and
             Central bundle configuration passed the release gate. The signed release was validated
             and published through the protected user-managed workflow, and the independent RAG
@@ -240,7 +240,7 @@ dependencies {
   </main>
 
   <footer class="footer">
-    <span>Development version: MIT · published 0.1.0: Apache-2.0</span>
+    <span>Version 1.0.0: MIT · historical 0.1.0: Apache-2.0</span>
     <span>Independent implementation in the ArchUnitEverything family. Not affiliated with ArchUnit.</span>
   </footer>
 </body>

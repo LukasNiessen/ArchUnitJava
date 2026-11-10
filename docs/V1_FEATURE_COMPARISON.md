@@ -1,5 +1,8 @@
 # Version 1 feature review
 
+Version `1.0.0` was published on 2026-11-10 after the blockers below were resolved. See
+[release evidence](V1_READINESS.md) for the signed bundle and public-consumer checks.
+
 Reviewed 2026-11-02 against current upstream main commits (read without changing sibling working
 trees): [Ruby 288645b](https://github.com/dragonsec-ai/ArchUnitRuby/tree/288645b75c409a87efa0b09ce5a1db61e950e71e),
 [Python 62d620a](https://github.com/LukasNiessen/ArchUnitPython/tree/62d620a7e34a2895d9574aee7f3ee07a9fedef79),

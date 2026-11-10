@@ -1,5 +1,7 @@
 # Version 1.0 work items
 
+Completed for the `1.0.0` publication on 2026-11-10. See [release evidence](V1_READINESS.md).
+
 ## Stack-safe cycles — #86
 
 Replace recursive SCC and elementary-cycle traversal with explicit stacks. Preserve ordering,

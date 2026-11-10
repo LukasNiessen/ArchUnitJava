@@ -1,8 +1,28 @@
 # Release status
 
-The next release is the `1.0.0` candidate. Its current evidence and remaining go/no-go gates are
-tracked in [V1_READINESS.md](V1_READINESS.md). The record below describes the immutable published
-beta; its test counts and account configuration are historical, not current candidate evidence.
+**Decision: PUBLISHED 1.0.** Version `1.0.0` was published on 2026-11-10 as
+`io.github.tristankruse:archunitjava:1.0.0`, under MIT, with JDK 25 required at runtime.
+
+The signed `v1.0.0` tag targets `970d5f79005153b229ab526203482138446a4756`.
+[Tag preparation](https://github.com/dragonsec-ai/ArchUnitJava/actions/runs/42804890008) and
+[Central staging](https://github.com/dragonsec-ai/ArchUnitJava/actions/runs/42806337865) passed.
+The exact non-snapshot candidate passed 378 tests (zero failures/errors, one Linux opt-in skip),
+doclint and the public API gate. All sixteen checksums and four signatures were independently
+verified against release key `8F7C42989C49216FA75523251BB3BFA38C776312`.
+
+[Publication](https://github.com/dragonsec-ai/ArchUnitJava/actions/runs/42809671438) used the reviewed
+deployment `0aa00785-a3b2-4560-b3f7-74463a3fc56f`. Central subsequently reported `PUBLISHED`.
+Public POM/JAR SHA-256 values match the retained bundle, and the separate RAG consumer passed all
+five tests against public `1.0.0` using a fresh Maven repository. The checked-in
+[machine-readable review record](releases/1.0.0.json) contains all artifact hashes and run IDs.
+
+See the [completed v1 checklist](V1_READINESS.md) and [compatibility contract](COMPATIBILITY.md).
+The development line has advanced to `1.0.1-SNAPSHOT`.
+
+## Historical 0.1.0 beta record
+
+The following record describes the immutable beta; its test counts and account configuration are
+historical, not current candidate evidence.
 
 **Decision: PUBLISHED PUBLIC BETA.** Version `0.1.0` became publicly available from Maven Central on
 2026-09-01.
@@ -132,3 +152,9 @@ deployment ID using the same protected environment. It verifies the signed relea
 accepts only the expected Maven coordinate in a validated or already publishing state. Credentials
 remain environment-backed; inspect mode never requests publication. Once published, confirm the
 public artifacts from a clean Maven repository before marking the GitHub release stable.
+
+Central can return an empty `purls` list once a deployment reaches `PUBLISHED`. In that state the
+publisher requires the exact committed `docs/releases/<version>.json` review record to recover the
+original coordinate. An unpublished/validated deployment must still return exactly the requested
+coordinate; a review record cannot bypass that check. Keep the review record from the verified
+bundle before future publications.

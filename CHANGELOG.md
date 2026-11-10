@@ -5,6 +5,8 @@ uses semantic versioning for public releases.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-10
+
 ### Added
 
 - protected inspection/publication of reviewed Maven Central deployments with exact-coordinate
@@ -64,5 +66,6 @@ uses semantic versioning for public releases.
 - The performance corpus is regression evidence, not an absolute scalability claim.
 - Unrestricted regex and lossless non-neutralized CSV require explicitly named trusted APIs.
 
-[Unreleased]: https://github.com/dragonsec-ai/ArchUnitJava/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/dragonsec-ai/ArchUnitJava/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/dragonsec-ai/ArchUnitJava/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/dragonsec-ai/ArchUnitJava/releases/tag/v0.1.0

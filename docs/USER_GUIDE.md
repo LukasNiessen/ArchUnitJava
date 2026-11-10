@@ -1,12 +1,10 @@
 # ArchUnitJava user guide
 
-ArchUnitJava `0.1.0` is a **public beta**. It is useful for evaluation and new architecture-test
-suites, but its pre-1.0 Java API may change between minor versions. The established ArchUnit
-library remains the mature default for production Java systems.
-
-Current source prepares `1.0.0-SNAPSHOT`. Properties cycle rules and the corrected cycle filtering
-are development-candidate features; published `0.1.0` does not include them. See the
-[v1 checklist](V1_READINESS.md) before choosing a release candidate for production.
+ArchUnitJava `1.0.0` is published on Maven Central. It provides architecture policies over compiled
+Java with the API, schema and JDK 25 baseline defined in the [compatibility contract](COMPATIBILITY.md).
+The [completed v1 checklist](V1_READINESS.md) records release and clean-installation evidence.
+Version 1 includes corrected cycle filtering and declarative cycle rules; the older `0.1.0` beta
+does not include those fixes and additions.
 
 This guide maps each important feature to its normal workflow. The
 [five-minute quickstart](../README.md#-five-minute-quickstart) remains the shortest path to a first
@@ -35,13 +33,13 @@ Add the Maven Central artifact as a test dependency:
 <dependency>
   <groupId>io.github.tristankruse</groupId>
   <artifactId>archunitjava</artifactId>
-  <version>0.1.0</version>
+  <version>1.0.0</version>
   <scope>test</scope>
 </dependency>
 ```
 
 Gradle users need `mavenCentral()` and
-`testImplementation("io.github.tristankruse:archunitjava:0.1.0")`. The complete tested example is
+`testImplementation("io.github.tristankruse:archunitjava:1.0.0")`. The complete tested example is
 in [`examples/basic`](../examples/basic), and a separate application consumes the public artifact
 in the [RAG test repository](https://github.com/TristanKruse/ArchUnitJava-TestRepo-RAG).
 
@@ -139,7 +137,7 @@ component. See the
 Three levels are available:
 
 1. Call `CliRunner` in an ordinary JUnit test, as in `examples/basic`. This is the recommended
-   public-beta path because the configuration is small and the test controls approved paths.
+   path because the configuration is small and the test controls approved paths.
 2. Evaluate Java API rules and pass results to `ArchitectureAssertions.assertPasses(...)`.
 3. Use explicit `@ArchitectureTest` methods with the optional `ArchitectureTestEngine` when separate
    discoverable architecture cases are useful.
@@ -186,7 +184,7 @@ throughput or heap-size claim. See [Performance methodology](PERFORMANCE.md).
 
 ## Maven and Gradle projects
 
-The public beta ships a CLI/library contract and invocation bridges, not standalone Maven or Gradle
+The library ships a CLI/library contract and invocation bridges, not standalone Maven or Gradle
 plugins. The normal supported workflow is to add the library as a test dependency and call it from
 JUnit. If wrapping the bridge in a build plugin, run it after `compile` or `test-compile`, declare
 compiled output directories explicitly, and never start a nested target build. The exact bridge
