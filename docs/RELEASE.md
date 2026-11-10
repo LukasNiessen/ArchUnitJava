@@ -126,3 +126,9 @@ failure occurs only after bundle creation; CI then verifies the signed primary, 
 POM entries in `central-bundle.zip`. This exercises the bundler while making a remote upload
 impossible. The protected release workflow performs the corresponding credentialed upload with
 `autoPublish=false`.
+
+After reviewing the retained bundle, `publish-release.yml` can inspect or publish the exact
+deployment ID using the same protected environment. It verifies the signed release tag and
+accepts only the expected Maven coordinate in a validated or already publishing state. Credentials
+remain environment-backed; inspect mode never requests publication. Once published, confirm the
+public artifacts from a clean Maven repository before marking the GitHub release stable.

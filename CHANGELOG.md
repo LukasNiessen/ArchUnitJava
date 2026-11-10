@@ -7,6 +7,8 @@ uses semantic versioning for public releases.
 
 ### Added
 
+- protected inspection/publication of reviewed Maven Central deployments with exact-coordinate
+  checks and environment-backed credentials;
 - declarative type/package cycle rules with `kind=cycles` in the properties/JUnit integration;
 - an explicit v1 compatibility scope and public/protected API signature regression gate.
 

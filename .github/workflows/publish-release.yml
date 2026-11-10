@@ -1,0 +1,60 @@
+name: Publish reviewed Maven Central deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Final semantic version of the reviewed signed release
+        required: true
+        type: string
+      deployment_id:
+        description: Exact validated Central deployment UUID whose bundle was reviewed
+        required: true
+        type: string
+      mode:
+        description: Inspect or publish the reviewed immutable version
+        required: true
+        default: inspect
+        type: choice
+        options: [inspect, publish]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maven-central-publication
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: maven-central
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Verify release inputs and signed tag
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+          SIGNER: 8F7C42989C49216FA75523251BB3BFA38C776312
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_TYPE" = branch
+          test "$GITHUB_REF_NAME" = main
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          test "$(git cat-file -t "refs/tags/v$VERSION")" = tag
+          git merge-base --is-ancestor "refs/tags/v$VERSION" HEAD
+          curl --fail --silent --show-error \
+            "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x$SIGNER" | gpg --batch --import
+          git verify-tag --raw "v$VERSION" 2>"$RUNNER_TEMP/tag-status"
+          grep -F "[GNUPG:] VALIDSIG $SIGNER " "$RUNNER_TEMP/tag-status"
+      - name: Inspect or publish the exact validated deployment
+        env:
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          VERSION: ${{ inputs.version }}
+          DEPLOYMENT_ID: ${{ inputs.deployment_id }}
+          MODE: ${{ inputs.mode }}
+        run: python3 scripts/publish-central.py --version "$VERSION" --deployment-id "$DEPLOYMENT_ID" --mode "$MODE"
